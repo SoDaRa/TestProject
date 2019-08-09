@@ -21,7 +21,7 @@ func _ready():
 		call_deferred("add_child", trail_array[x])
 		trail_array[x].z_index = -x - BUFFER_LENGTH - 1
 		trail_array[x].centered = false
-	
+	#Wrote Code here
 	#Setup buffer
 	for x in range(BUFFER_LENGTH):
 		buffer_1.append(Sprite.new())
