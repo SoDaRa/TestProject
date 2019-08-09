@@ -1,0 +1,39 @@
+
+#In case using the mask proves too costly
+#Player
+#signal paint(mask_pos, mask, player_pos, player_color, player_rotation, player_scale, player_shape)
+#emit_signal("paint", mask_pos , my_mask, self.position, color_sequence[curr_color], self.rotation_degrees, $Sprite.scale, self.curr_shape)
+
+#Level
+#func _on_Player_paint(mask_pos, mask, player_pos, player_color, player_rotation, player_scale, player_shape):
+#	$BG1.paint_background(mask_pos, mask, player_color) #NOTE: BG Expansion Point
+#	$TrailHandler.draw_trail(player_pos, player_rotation, player_color, player_scale, player_shape)
+
+#Trail
+#var blank_ball = preload("res://Sprites/blank_ball.png")
+#var blank_box = preload("res://Sprites/blank_box.png")
+#var blank_tri = preload("res://Sprites/blank_triangle.png")
+#var blank_walrus = preload("res://Sprites/blank_walrus.png")
+#var blank_custom = preload("res://Sprites/blank_custom.png")
+#func draw_trail(player_pos:Vector2, player_rotation:float, player_color:Color, player_scale:Vector2, player_shape:int):
+#	var player_info = {"pos": player_pos, "rotation": player_rotation, "color": player_color, "scale": player_scale, "shape": player_shape}
+#	if trail_idx != -1:
+#		_draw_main(mask_info)
+#	else:
+#		_draw_buffer(mask_info)
+
+#func _update_sprite(to_update: Sprite, mask_info: Dictionary) -> Sprite:
+#	to_update.position = mask_info["pos"]
+#	to_update.rotation_degrees = player_info["rotation"]
+#	to_update.modulate = player_info["color"]
+#	to_update.scale = player_info["scale"]
+#
+#	#Setting to player shape
+#	match(player_info["shape"]): #HACK: Try using a class or something for this or the player's mask image?
+#		0: to_update.texture = blank_box
+#		1: to_update.texture = blank_ball
+#		2: to_update.texture = blank_tri
+#		3: to_update.texture = blank_walrus
+#		4: to_update.texture = blank_custom
+#		_: print("SHAPE ERROR!!")
+#Also make sure the trail sprites are centered

@@ -1,0 +1,46 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Scripts/TestScene.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scripts/KinematicBody2D.gd" type="Script" id=3]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 500, 50 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 300, 40 )
+
+[node name="MyRoot" type="Node"]
+script = ExtResource( 1 )
+color_sequence = [ Color( 0.99, 1, 1, 1 ), Color( 1, 0, 0, 1 ), Color( 0.47451, 0, 0.94902, 1 ), Color( 0, 0.733333, 0.164706, 1 ) ]
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+position = Vector2( 775.526, 156.684 )
+script = ExtResource( 3 )
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+position = Vector2( 511.773, 545.374 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+shape = SubResource( 1 )
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2( 5.45697, 339.058 )
+rotation = 0.884882
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+position = Vector2( -1.03168, -0.209061 )
+shape = SubResource( 2 )
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+position = Vector2( 795.983, 276.953 )
+rotation = 1.5708
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+position = Vector2( -0.10379, -162.315 )
+shape = SubResource( 2 )
+
+[node name="Background" type="Sprite" parent="."]
+z_index = -2
+z_as_relative = false
+centered = false

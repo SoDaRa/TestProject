@@ -1,0 +1,43 @@
+HIT SAVE TO SAVE CHANGES!
+
+To-Do
+- Method to pop players back inbounds should they fall out
+- HUD element showing color selection
+    - Make color wheel radial
+- HUD element showing shapes available?
+- Options menu
+- Input mapping in-game
+- Save feature
+- Fix clipping into walls in Fly mode
+- Standardize code (work out where signal functions go and all that)
+- Make custom color picker for mouse
+- Implement missions
+ (in -x and -y)
+- Make way to add custom png for custom_mode
+- Fix Problems
+
+Questions to answer:
+- When selecting an already played level, should the player start from scratch, reload the way it was left, or give an option?
+- How large should levels be?
+- Should speed be tied to size?
+- Keyboard/Mouse Controls
+- Consider making the game a metroidvania maybe?
+- Make list of all unlocks and think how to spread them out.
+- Think up level themes.
+
+Notes:
+- Make missions take place on seperate background or seperate layer to not overwrite what player drew on main.
+- Project Settings > Rendering > Environment > Default Clear Color
+- DON'T make edges of platforms black
+- Never set PlayerMask to invisible. Stops painting from working
+- Make sure Player's paint signal is connected to something to paint
+- Dummy_Button is just a button to test a feature without having to worry about any other input and SHOULD BE REMOVED IN FINAL BUILD!!!
+
+Dialogue Tree Notes:
+- Conditionals in Dialogue Tree are handled as strings. Use placeholders to put info back into them.
+- PassCondition tells if the conditional is true or not
+- MUST Ctrl+S to save Dialogue Tree!!!!
+
+TODO Notes:
+- Supports TODO, HACK, BUG, FIXME, and NOTE
+- Just write that on a line where you want it to take you and when you click on it it'll warp you to it.

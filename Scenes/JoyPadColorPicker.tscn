@@ -1,0 +1,200 @@
+[gd_scene load_steps=13 format=2]
+
+[ext_resource path="res://Scripts/JoyPadColorPicker.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/MainDisplayJoypadColorPicker.gd" type="Script" id=2]
+[ext_resource path="res://JoyPadColorPickerSprites/SlimColorWheelwOutlineFit.png" type="Texture" id=3]
+[ext_resource path="res://Scripts/JPCPSample.gd" type="Script" id=4]
+[ext_resource path="res://JoyPadColorPickerSprites/Selector.png" type="Texture" id=5]
+[ext_resource path="res://PresetColorTheme.tres" type="Theme" id=6]
+[ext_resource path="res://Scripts/PresetColor.gd" type="Script" id=7]
+[ext_resource path="res://JoyPadColorPickerSprites/PresetAdd.png" type="Texture" id=8]
+[ext_resource path="res://JoyPadColorPickerSprites/PresetAddPressed.png" type="Texture" id=9]
+[ext_resource path="res://JoyPadColorPickerSprites/PresetAddFocus.png" type="Texture" id=10]
+[ext_resource path="res://Scripts/AddButton.gd" type="Script" id=11]
+
+[sub_resource type="Theme" id=2]
+
+[node name="JoyPadColorPicker" type="PanelContainer"]
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+margin_left = -1280.0
+margin_top = -360.0
+margin_right = -744.0
+margin_bottom = 166.0
+script = ExtResource( 1 )
+color = Color( 1, 0, 0, 1 )
+
+[node name="VBox" type="VBoxContainer" parent="."]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 529.0
+margin_bottom = 519.0
+
+[node name="Main" type="HBoxContainer" parent="VBox"]
+margin_right = 522.0
+margin_bottom = 468.0
+focus_neighbour_bottom = NodePath("../PresetBar/AddButton")
+focus_mode = 2
+script = ExtResource( 2 )
+
+[node name="Display" type="CenterContainer" parent="VBox/Main"]
+editor/display_folded = true
+margin_right = 468.0
+margin_bottom = 468.0
+
+[node name="ColorWheel" type="TextureRect" parent="VBox/Main/Display"]
+margin_right = 468.0
+margin_bottom = 468.0
+texture = ExtResource( 3 )
+
+[node name="Sample" type="ColorRect" parent="VBox/Main/Display"]
+margin_left = 106.0
+margin_top = 106.0
+margin_right = 361.0
+margin_bottom = 361.0
+rect_min_size = Vector2( 255, 255 )
+script = ExtResource( 4 )
+
+[node name="SaturationBar" type="ColorRect" parent="VBox/Main/Display/Sample"]
+margin_left = 255.0
+margin_right = 257.0
+margin_bottom = 255.0
+
+[node name="ValueBar" type="ColorRect" parent="VBox/Main/Display/Sample"]
+margin_right = 255.0
+margin_bottom = 2.0
+
+[node name="Preview" type="ColorRect" parent="VBox/Main"]
+margin_left = 472.0
+margin_right = 522.0
+margin_bottom = 468.0
+rect_min_size = Vector2( 50, 468 )
+color = Color( 1, 0, 0, 1 )
+
+[node name="Selector" type="Sprite" parent="VBox/Main"]
+position = Vector2( -7, -7 )
+scale = Vector2( 0.843356, 0.843356 )
+z_index = 1
+texture = ExtResource( 5 )
+
+[node name="PresetBar" type="HBoxContainer" parent="VBox"]
+margin_top = 472.0
+margin_right = 522.0
+margin_bottom = 512.0
+
+[node name="0" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="1" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="2" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="3" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="4" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="5" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="6" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="7" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="8" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="9" type="Button" parent="VBox/PresetBar"]
+visible = false
+margin_right = 50.0
+margin_bottom = 40.0
+rect_min_size = Vector2( 50, 40 )
+theme = ExtResource( 6 )
+script = ExtResource( 7 )
+
+[node name="AddButton" type="TextureButton" parent="VBox/PresetBar"]
+margin_right = 50.0
+margin_bottom = 40.0
+theme = SubResource( 2 )
+texture_normal = ExtResource( 8 )
+texture_pressed = ExtResource( 9 )
+texture_hover = ExtResource( 10 )
+texture_focused = ExtResource( 10 )
+script = ExtResource( 11 )
+[connection signal="lose_focus" from="VBox/Main" to="." method="_on_lose_focus"]
+[connection signal="main_color_changed" from="VBox/Main" to="." method="_on_Main_main_color_changed"]
+[connection signal="new_preset_selected" from="VBox/Main" to="." method="_on_Main_new_preset_selected"]
+[connection signal="color_pressed" from="VBox/PresetBar/0" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/0" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/1" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/1" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/2" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/2" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/3" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/3" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/4" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/4" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/5" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/5" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/6" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/6" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/7" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/7" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/8" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/8" to="." method="_on_preset_removed"]
+[connection signal="color_pressed" from="VBox/PresetBar/9" to="." method="_on_preset_selected"]
+[connection signal="preset_removed" from="VBox/PresetBar/9" to="." method="_on_preset_removed"]
+[connection signal="lose_focus" from="VBox/PresetBar/AddButton" to="." method="_on_lose_focus"]
+[connection signal="pressed" from="VBox/PresetBar/AddButton" to="." method="_on_AddButton_pressed"]

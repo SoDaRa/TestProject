@@ -1,0 +1,81 @@
+[gd_scene load_steps=9 format=2]
+
+[ext_resource path="res://Scripts/TestLevel.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/Player.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Scenes/PlayerMask.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Ramp.png" type="Texture" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 500, 20 )
+
+[sub_resource type="RectangleShape2D" id=2]
+extents = Vector2( 4000, 50 )
+
+[sub_resource type="RectangleShape2D" id=3]
+extents = Vector2( 4000, 50 )
+
+[sub_resource type="PhysicsMaterial" id=4]
+friction = 0.0
+
+[node name="TestLevel" type="Node"]
+script = ExtResource( 1 )
+color_sequence = [ Color( 1, 1, 1, 1 ), Color( 0, 1, 1, 1 ), Color( 1, 0, 1, 1 ), Color( 1, 1, 0, 1 ) ]
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+position = Vector2( 66.2979, 171.883 )
+
+[node name="PlayerMask" parent="Player" instance=ExtResource( 3 )]
+modulate = Color( 1, 1, 1, 0.00392157 )
+margin_left = -37.5
+margin_top = -37.5
+margin_right = 37.5
+margin_bottom = 37.5
+
+[node name="Starting Platform" type="StaticBody2D" parent="."]
+position = Vector2( 525.669, 543.25 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Starting Platform"]
+shape = SubResource( 1 )
+
+[node name="Borders" type="Node" parent="."]
+editor/display_folded = true
+
+[node name="LeftWall" type="StaticBody2D" parent="Borders"]
+position = Vector2( -50, 2000 )
+rotation = 1.5708
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/LeftWall"]
+shape = SubResource( 2 )
+
+[node name="RightWall" type="StaticBody2D" parent="Borders"]
+position = Vector2( 4050, 2000 )
+rotation = 1.5708
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/RightWall"]
+shape = SubResource( 2 )
+
+[node name="Ceiling" type="StaticBody2D" parent="Borders"]
+position = Vector2( 2000, -50 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/Ceiling"]
+shape = SubResource( 3 )
+
+[node name="Floor" type="StaticBody2D" parent="Borders"]
+position = Vector2( 2000, 4050 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/Floor"]
+shape = SubResource( 3 )
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+position = Vector2( 1332.85, 884.287 )
+scale = Vector2( 6.77883, 6.56327 )
+physics_material_override = SubResource( 4 )
+
+[node name="Sprite" type="Sprite" parent="StaticBody2D2"]
+texture = ExtResource( 4 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D2"]
+scale = Vector2( 5.57584, 5.32761 )
+polygon = PoolVector2Array( -7.94382, -10.3114, -7.70062, -6.42091, -6.17203, -1.58504, -4.33072, 1.43286, -2.48947, 3.61446, -0.196503, 5.4688, 2.79123, 7.03229, 5.39682, 7.90492, 8.0719, 8.34125, 9.98264, 8.34125, 10.1216, 10.4138, -9.88937, 10.2683, -9.87626, -10.3073 )
+
+[editable path="Player"]

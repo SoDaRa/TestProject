@@ -1,0 +1,77 @@
+[gd_resource type="Resource" load_steps=3 format=2]
+
+[ext_resource path="res://addons/dialogue_tree/assets/ResIcon.png" type="Texture" id=1]
+[ext_resource path="res://addons/dialogue_tree/resource/dialogue_tree.gd" type="Script" id=2]
+
+[resource]
+script = ExtResource( 2 )
+__meta__ = {
+"_editor_icon": ExtResource( 1 )
+}
+connections = [ {
+"from": "StartNode",
+"from_port": 0,
+"to": "BasicDialogue",
+"to_port": 0
+}, {
+"from": "BasicDialogue",
+"from_port": 0,
+"to": "BasicDialogue2",
+"to_port": 0
+}, {
+"from": "BasicDialogue2",
+"from_port": 0,
+"to": "EndNode",
+"to_port": 0
+} ]
+Nodes = [ {
+"filename": "res://addons/dialogue_tree/scenes/EndNode.tscn",
+"name": "EndNode",
+"rect_size_x": 80.0,
+"rect_size_y": 55.0,
+"rect_x": 0.0,
+"rect_y": 0.0
+}, {
+"filename": "res://addons/dialogue_tree/scenes/StartNode.tscn",
+"name": "StartNode",
+"rect_size_x": 87.0,
+"rect_size_y": 55.0,
+"rect_x": 0.0,
+"rect_y": 0.0
+}, {
+"Actor": "My Man",
+"Dialogue": "What's happening man?",
+"RefName": "TestDialogue",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue",
+"rect_size_x": 170.0,
+"rect_size_y": 114.0,
+"rect_x": 0.0,
+"rect_y": 0.0
+}, {
+"Actor": "My Man",
+"Dialogue": "You look cool :D",
+"RefName": "TestDialogue2",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue2",
+"rect_size_x": 170.0,
+"rect_size_y": 114.0,
+"rect_x": 0.0,
+"rect_y": 0.0
+} ]
+DialogueTree = {
+"dialogue": [ {
+"Actor": "My Man",
+"Dialogue": "What's happening man?",
+"NodeName": "BasicDialogue",
+"Ref": "TestDialogue",
+"next": 1
+}, {
+"Actor": "My Man",
+"Dialogue": "You look cool :D",
+"NodeName": "BasicDialogue2",
+"Ref": "TestDialogue2",
+"next": "End"
+} ],
+"start_index": 0
+}

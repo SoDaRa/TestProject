@@ -1,0 +1,154 @@
+[gd_scene load_steps=16 format=2]
+
+[ext_resource path="res://Scripts/TestLevel2.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/PlayerVer2.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Ramp.png" type="Texture" id=3]
+[ext_resource path="res://Scenes/MyMan.tscn" type="PackedScene" id=4]
+[ext_resource path="res://Scenes/DialogueUIScene.tscn" type="PackedScene" id=5]
+[ext_resource path="res://TestCloud.png" type="Texture" id=6]
+[ext_resource path="res://TestDoor.png" type="Texture" id=7]
+[ext_resource path="res://TestFrog.png" type="Texture" id=8]
+[ext_resource path="res://TestMan.png" type="Texture" id=9]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 500, 20 )
+
+[sub_resource type="Gradient" id=2]
+
+[sub_resource type="GradientTexture" id=3]
+gradient = SubResource( 2 )
+width = 1000
+
+[sub_resource type="RectangleShape2D" id=4]
+extents = Vector2( 2600, 50 )
+
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 2500, 50 )
+
+[sub_resource type="PhysicsMaterial" id=6]
+friction = 0.0
+
+[node name="TestLevel2" type="Node"]
+pause_mode = 2
+script = ExtResource( 1 )
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+editor/display_folded = true
+position = Vector2( 217.124, 242.178 )
+z_index = 10
+
+[node name="PlayerMask" parent="Player" index="3"]
+show_behind_parent = true
+
+[node name="Starting Platform" type="StaticBody2D" parent="."]
+pause_mode = 1
+position = Vector2( 642.582, 540.978 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Starting Platform"]
+shape = SubResource( 1 )
+
+[node name="Sprite" type="Sprite" parent="Starting Platform"]
+texture = SubResource( 3 )
+region_enabled = true
+region_rect = Rect2( 100, 100, 1000, 40 )
+
+[node name="Borders" type="Node2D" parent="."]
+pause_mode = 1
+
+[node name="LeftWall" type="StaticBody2D" parent="Borders"]
+position = Vector2( -50, 2500 )
+rotation = 1.5708
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/LeftWall"]
+shape = SubResource( 4 )
+
+[node name="RightWall" type="StaticBody2D" parent="Borders"]
+position = Vector2( 5050, 2500 )
+rotation = 1.5708
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/RightWall"]
+shape = SubResource( 4 )
+
+[node name="Ceiling" type="StaticBody2D" parent="Borders"]
+position = Vector2( 2500, -50 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/Ceiling"]
+shape = SubResource( 5 )
+
+[node name="Floor" type="StaticBody2D" parent="Borders"]
+position = Vector2( 2500, 5050 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Borders/Floor"]
+shape = SubResource( 5 )
+
+[node name="Ramp" type="StaticBody2D" parent="."]
+pause_mode = 1
+editor/display_folded = true
+position = Vector2( 1515.4, 884.652 )
+scale = Vector2( 6.77883, 6.56327 )
+physics_material_override = SubResource( 6 )
+
+[node name="Sprite" type="Sprite" parent="Ramp"]
+texture = ExtResource( 3 )
+
+[node name="CollisionPolygon2D2" type="CollisionPolygon2D" parent="Ramp"]
+position = Vector2( 0, -0.414536 )
+polygon = PoolVector2Array( -42.5333, -37.1668, -36.6361, -16.6681, -24.9931, 5.26053, -18.3726, 13.0417, -9.20837, 21.7577, 2.40211, 30.0187, 18.611, 36.8566, 35.8889, 41.9604, 54.7955, 43.6946, 55, 55, -55, 55, -55, -55, -43.485, -54.9842 )
+
+[node name="MyMan" parent="." instance=ExtResource( 4 )]
+
+[node name="ZoomCamera" type="Camera2D" parent="."]
+position = Vector2( 2000, 2000 )
+zoom = Vector2( 5.6, 5.6 )
+drag_margin_h_enabled = false
+drag_margin_v_enabled = false
+
+[node name="DialogueLayer" parent="." groups=[
+"Dialogue",
+] instance=ExtResource( 5 )]
+editor/display_folded = true
+
+[node name="Cloud" type="StaticBody2D" parent="."]
+editor/display_folded = true
+position = Vector2( 2790.49, 572.409 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Cloud"]
+polygon = PoolVector2Array( 30.2, -179.5, 32.5, -181.9, 35, -180.8, 35, -180, 63, -172, 63, -170.5, 110, -133.5, 110, -132.4, 122, -119.3, 122, -118, 129, -105, 129, -103.5, 129.8, -94.5, 133, -91.3, 133, -61.6, 145, -62.7, 145, -61.2, 162.3, -58.5, 166.7, -58.5, 184, -60.8, 184, -59.2, 206, -55.2, 206, -53.8, 223, -45.8, 223, -44.5, 239, -32.5, 239, -31.2, 254, -11.2, 254, -8.8, 263, 18.2, 263, 75.5, 261.3, 75.5, 259.1, 79.8, 261.4, 82, 260.3, 84.5, 259.1, 84.5, 250, 100, 250, 100.7, 251.4, 102, 250.3, 104.5, 249, 104.5, 240, 117.5, 238.7, 117.5, 201.7, 145.5, 198.6, 145.5, 187.6, 152.5, 180.8, 152.5, 177.8, 155.5, 175.8, 155.5, 169.4, 153.9, 166.8, 156.5, 164.7, 156.5, 160, 155.1, 127, 157.6, 127, 156, 113.4, 152, 97.9, 169.5, 95.8, 169.5, 84.8, 179.5, 83.4, 179.5, 75.4, 182.5, 24.6, 182.5, 2.10001, 172.2, -19.6, 181.5, -21.8, 181.5, -22.8, 180.5, -53.5, 182.5, -55, 182.5, -55, 181, -75, 176.1, -75, 174.5, -95.7, 159.5, -107, 159.5, -107, 157.9, -125.5, 150.5, -126.6, 150.5, -137.6, 155.5, -139.1, 155.5, -145.4, 154.7, -148.2, 157.5, -150.6, 157.5, -152.2, 156.4, -174, 158.7, -174, 157.2, -190, 154.2, -190, 152.7, -204, 145.7, -204, 144.2, -223, 122.2, -223, 117.5, -228.5, 97.5, -229.8, 97.5, -239, 88.3, -239, 75.5, -239.6, 75.5, -250, 68.6, -250, 67.1, -260, 53.1, -260, 49.9, -263, 43.3, -263, -3.5, -260.6, -12.5, -259.1, -12.5, -247, -32.1, -247, -33.9, -236.3, -57.5, -234.9, -57.5, -220.9, -74.5, -217.9, -74.5, -204.8, -86.5, -203.5, -86.5, -191.5, -92.5, -190, -92.5, -177.2, -95.5, -175.9, -95.5, -159, -93.7, -142.2, -97.5, -140.9, -97.5, -111, -93.8, -105.6, -119.5, -104, -119.5, -86, -145.5, -83.6, -145.5, -69, -154.6, -69, -155.4, -47.8, -174.5, -44.5, -174.5, -30.5, -182.5, -28.3, -182.5, 10.6, -182.5 )
+
+[node name="Sprite" type="Sprite" parent="Cloud"]
+texture = ExtResource( 6 )
+
+[node name="Door" type="StaticBody2D" parent="."]
+editor/display_folded = true
+position = Vector2( 1452.84, 3304.78 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Door"]
+polygon = PoolVector2Array( 158, 292, -148.3, 292, -158, 289.1, -158, -292, 158, -292 )
+
+[node name="Sprite" type="Sprite" parent="Door"]
+texture = ExtResource( 7 )
+
+[node name="Frog" type="StaticBody2D" parent="."]
+editor/display_folded = true
+position = Vector2( 3121.97, 2923.7 )
+rotation = -0.967053
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Frog"]
+polygon = PoolVector2Array( -60, -199.1, -60, -197.6, -42, -187.7, -42, -186.5, -33, -179.5, -33, -177.1, -19, -156.1, -19, -153.5, -15.4, -139.5, -17.3, -139.5, -19.5, -127.5, 3, -111.5, 3, -110.3, 12.8, -100.5, 15.6, -100.5, 35.5, -88.5, 36.1, -88.5, 56, -86.3, 56, -84.8, 70.3, -78.5, 71, -78.5, 127, -80.5, 127, -79.4, 155, -78.4, 155, -76.9, 158.3, -75.6, 160.5, -77.9, 163, -76.8, 163, -75.9, 184, -67.9, 184, -66.5, 197.7, -55.5, 198.5, -55.5, 216, -46.7, 216, -45.5, 232, -32.5, 232, -29.2, 258, 3.8, 258, 4.89999, 264, 16, 264, 17.5, 266.7, 35.5, 274, 49, 274, 88.5, 272.5, 88.5, 270.5, 95.5, 268.9, 95.5, 257.9, 107.5, 253.5, 107.5, 247.7, 104.6, 239.1, 118.5, 237.8, 118.5, 230, 126.3, 230, 127.2, 233, 137.2, 233, 146.9, 232, 149.5, 237.8, 149.5, 252, 162.6, 252, 171.6, 250.8, 181.5, 248.8, 181.5, 239.8, 190.5, 230.4, 190.5, 202.3, 200.5, 139.7, 200.5, 116, 193, 116, 191.6, 102, 183.7, 102, 181.2, 98, 176.2, 98, 165, 101.8, 157.5, 103.3, 157.5, 113.3, 149.5, 129.5, 149.5, 134.4, 146.5, 187.2, 146.5, 189.2, 141.1, 188.2, 141.8, 186, 140.7, 165, 136, 151.2, 139.5, 149.4, 139.5, 147.8, 138.5, 145.8, 140.5, 111, 140.5, 111, 139.2, 97, 136.9, 73.2, 142.5, 53, 142.5, 53, 141, 42.9, 138.5, 41.8, 138.5, 39.5, 140.9, 37, 139.8, 37, 138.8, 31.7, 136.5, 26, 136.5, 18.9, 140.3, 32, 151.6, 32, 154.1, 34.4, 167.5, 32.1, 167.5, 19.2, 190.5, 17.7, 190.5, 10.7, 196.5, 7.10001, 196.5, -7.70001, 200.5, -118, 200.5, -118, 198.9, -135, 192.9, -135, 191.2, -142, 182.2, -142, 161.8, -136.5, 154.5, -138.9, 154.5, -159, 155.6, -159, 153.9, -176.4, 147.5, -213, 147.5, -213, 145.9, -233, 137.9, -233, 136.6, -249, 126.6, -249, 125.4, -264, 112.4, -264, 110.2, -274, 97.7, -274, 62.7, -270.7, 44.5, -269.1, 44.5, -266.1, 39.1, -274, 28.8, -274, 11.3, -270, 4, -270, -2.5, -274, -39.6, -274, -41.5, -271.8, -41.5, -264, -49.3, -258.5, -68.5, -257.1, -68.5, -251.1, -77.5, -249.7, -77.5, -219.7, -102.5, -215.4, -102.5, -187.3, -112.5, -185.4, -112.5, -183.8, -111.5, -146, -113.4, -139, -118.5, -139, -120.8, -127, -155.8, -127, -158.5, -129.7, -167.5, -127.7, -167.5, -124.7, -183.5, -123, -183.5, -114, -196.5, -110.6, -196.5, -104.2, -200.5, -66.3, -200.5 )
+
+[node name="Sprite" type="Sprite" parent="Frog"]
+texture = ExtResource( 8 )
+
+[node name="Man" type="StaticBody2D" parent="."]
+editor/display_folded = true
+position = Vector2( 1452.11, 2277.49 )
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="Man"]
+polygon = PoolVector2Array( -89, -173.9, -89, -172.5, -74, -160.5, -74, -158, -62, -137, -62, -128.5, -60.9, -107.5, -62.5, -107.5, -64.6, -98.2, -61.8, -92.5, -61.2, -92.5, -25, -57.2, -25, -125.5, -22.9, -125.5, -12.9, -136.5, 0.600006, -136.5, 5, -133.6, 5, -132.2, 13, -122.2, 13, -30.1, 10.7, -24.7, 95.8, 57.5, 175.7, 57.5, 184, 64.6, 184, 89.5, 181.6, 89.5, 172.6, 95.5, 111, 95.5, 111, 169.1, 104.1, 179.5, 79, 179.5, 79, 177.3, 73, 171.3, 73, 87.3, -21.8, -3.5, -75.9, -3.5, -130.8, 9.5, -139.6, 9.5, -146, 5.60001, -146, 4.3, -153, -2.7, -153, -17.5, -150.9, -17.5, -140.9, -28.5, -137.1, -28.5, -82.2, -41.5, -62.1, -41.5, -87.9, -65.5, -88.5, -65.5, -106.5, -55.5, -137, -55.5, -137, -57.2, -157, -66.2, -157, -67.6, -179, -86.6, -179, -89, -184, -97.6, -184, -138.2, -182.4, -142.5, -181.1, -142.5, -170.1, -160.5, -168.9, -160.5, -157.9, -172.5, -155.5, -172.5, -144.2, -179.5, -103, -179.5 )
+
+[node name="Sprite" type="Sprite" parent="Man"]
+texture = ExtResource( 9 )
+
+[editable path="Player"]
+
+[editable path="DialogueLayer"]
