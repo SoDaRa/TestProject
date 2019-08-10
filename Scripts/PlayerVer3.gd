@@ -37,7 +37,7 @@ onready var MySprite = get_node("SpriteScale/Sprite")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	custom_sprite = load("user://custom.png")
+#	custom_sprite = load("user://custom.png")
 	if custom_sprite == null:
 		custom_sprite = load("res://Sprites/default_custom.png")
 	if custom_sprite.get_size() != box_sprite.get_size():

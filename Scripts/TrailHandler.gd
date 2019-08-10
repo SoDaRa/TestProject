@@ -5,7 +5,7 @@ export var TRAIL_LENGTH = 300
 var trail_array = []  				#Main Trail array
 var trail_idx = TRAIL_LENGTH - 1 	#Keeps track of which main trail sprite is to be used next
 
-export var BUFFER_LENGTH = 200
+export var BUFFER_LENGTH = 400
 var buffer_1 = []
 var buffer_2 = []
 var buffer_idx = BUFFER_LENGTH - 1 	#Keeps track of which buffer trail sprite is to be used next
@@ -51,8 +51,7 @@ func hide_trail():
 		buffer_1_in_use = true
 	else:
 		buffer_1_in_use = false
-	print("Clear")
-	print(" ")
+	print("Trail Clear")
 
 func draw_trail(mask: Image, mask_pos:Vector2, player_color:Color):
 	var mask_info = {"pos": mask_pos, "image": mask, "color": player_color}
@@ -78,8 +77,9 @@ func _draw_buffer(mask_info: Dictionary):
 		_update_sprite(buffer_2[buffer_idx], mask_info)
 	buffer_idx -= 1
 	
-	if buffer_idx == -1:
+	if buffer_idx <= -1:
 		print("Buffer_idx is negative!!")
+		hide_trail()
 
 func _update_sprite(to_update: Sprite, mask_info: Dictionary):
 	var player_color = Image.new()

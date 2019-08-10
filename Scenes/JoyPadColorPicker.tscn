@@ -12,7 +12,7 @@
 [ext_resource path="res://JoyPadColorPickerSprites/PresetAddFocus.png" type="Texture" id=10]
 [ext_resource path="res://Scripts/AddButton.gd" type="Script" id=11]
 
-[sub_resource type="Theme" id=2]
+[sub_resource type="Theme" id=1]
 
 [node name="JoyPadColorPicker" type="PanelContainer"]
 anchor_left = 1.0
@@ -167,7 +167,7 @@ script = ExtResource( 7 )
 [node name="AddButton" type="TextureButton" parent="VBox/PresetBar"]
 margin_right = 50.0
 margin_bottom = 40.0
-theme = SubResource( 2 )
+theme = SubResource( 1 )
 texture_normal = ExtResource( 8 )
 texture_pressed = ExtResource( 9 )
 texture_hover = ExtResource( 10 )

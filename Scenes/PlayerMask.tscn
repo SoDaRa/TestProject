@@ -8,7 +8,7 @@ margin_bottom = 75.0
 stretch = true
 
 [node name="Viewport" type="Viewport" parent="."]
-size = Vector2( 200, 200 )
+size = Vector2( 75, 75 )
 transparent_bg = true
 handle_input_locally = false
 disable_3d = true

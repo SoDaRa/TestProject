@@ -14,7 +14,7 @@ To-Do
 - Implement missions
  (in -x and -y)
 - Make way to add custom png for custom_mode
-- Fix Problems
+- Use VisibilityNotifier2D to optimize when things are shown
 
 Questions to answer:
 - When selecting an already played level, should the player start from scratch, reload the way it was left, or give an option?

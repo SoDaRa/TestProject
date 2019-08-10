@@ -33,7 +33,7 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 		#Horizontal Movement
 		if Input.is_action_pressed("right") && state.linear_velocity.x < MAX_HORIZONTAL_SPEED:
 			state.apply_central_impulse(Vector2(side_speed_growth, 0))
-		if Input.is_action_pressed("left") && state.linear_velocity.x > MAX_HORIZONTAL_SPEED * -1:
+		if Input.is_action_pressed("left") && state.linear_velocity.x > -MAX_HORIZONTAL_SPEED:
 			state.apply_central_impulse((Vector2(side_speed_growth * -1, 0)))
 		#Jump
 		if Input.is_action_just_pressed("up") && state.get_contact_count() > 0 && state.linear_velocity.y > -MAX_VERTICAL_SPEED:

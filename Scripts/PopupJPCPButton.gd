@@ -48,7 +48,6 @@ func _pressed():
 		for idx in range(presets.size()):
 			mouse_picker.add_preset(presets[idx])
 		mouse_popup.popup()
-		mouse_picker.grab_focus()
 #		hide()
 	popup_opened = true
 
@@ -71,6 +70,6 @@ func _close_mouse_popup():
 	
 func _popup_closed():
 	show()
-	self.grab_focus()
+	self.grab_focus() #FIX: Use set_focus_mode() to allow a control to get focus
 	self.self_modulate = color
 	popup_opened = false
