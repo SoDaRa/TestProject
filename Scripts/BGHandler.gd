@@ -21,37 +21,42 @@ var paint_1_in_use = false #Refers to which one is being used to update the back
 var images_to_process = -1 #Tracks how many sprites need to be updated in an updating cycle
 
 var updating = false
-var draw_frame = true
-var count = 0
+#var draw_frame = true
+#var count = 0
 
-signal update_complete
+var index_id = -1 #Used to signal where it is in the level's bg_node_array
+
+signal update_start(id)
+signal update_complete(id)
 	
 # warning-ignore:unused_argument
 func _process(delta):
 	if images_to_process > -1:
-		if $VisibilityNotifier2D.is_on_screen():
-			_update_background()
-		if draw_frame && !$VisibilityNotifier2D.is_on_screen():
-			_update_background()
-			draw_frame = false
-		elif !draw_frame && count != 3:
-			count += 1
-		elif !draw_frame && count == 3:
-			draw_frame = true
-			count = 0
+		_update_background()
+#		if $VisibilityNotifier2D.is_on_screen():
+#			_update_background()
+#			return
+#		if draw_frame:
+#			_update_background()
+#			draw_frame = false
+#		elif !draw_frame && count != 2:
+#			count += 1
+#		elif !draw_frame && count == 2:
+#			draw_frame = true
+#			count = 0
 
 func setup(image_size:int, sprite_size:int, background_color:Color):
 	BG_SIZE = image_size
 	BG_SPRITE_SIZE = sprite_size
 	bg_color = background_color
-	$VisibilityNotifier2D.rect = Rect2(self.position, Vector2(BG_SIZE, BG_SIZE))
+#	$VisibilityNotifier2D.rect = Rect2(self.position, Vector2(BG_SIZE, BG_SIZE))
 	if bg == null:
 		bg = Image.new()
 		bg.create(BG_SIZE, BG_SIZE, false, Image.FORMAT_RGB8)
 		bg.fill(bg_color)
 	
-	array_width = int(bg.get_width()) / BG_SPRITE_SIZE
-	array_height = int(bg.get_height()) / BG_SPRITE_SIZE
+	array_width = int(bg.get_width() / BG_SPRITE_SIZE)
+	array_height = int(bg.get_height() / BG_SPRITE_SIZE)
 	
 	for x in range(array_width): #HACK Consider ways to divide up background for non-1000x1000 sizes
 		for y in range(array_height):
@@ -70,20 +75,21 @@ func setup(image_size:int, sprite_size:int, background_color:Color):
 			
 			sprite_rect_array.append(sprite_rect)
 
-func start_sprite_update():
+func start_sprite_update(): #NOTE: Is called from $VisibilityNotifier2D screen_exited()
 	if !updating:
 		if paint_1_in_use == false:
 			images_to_process = paint_array_1.size() - 1
 			paint_1_in_use = true
 			updating = true
-			print("		Images to Process is ", images_to_process + 1)
+			
 		else:
 			images_to_process = paint_array_2.size() - 1
 			paint_1_in_use = false
 			updating = true
-			print("		Images to Process is ", images_to_process + 1)
+		emit_signal("update_start", index_id)
+		print("		Images to Process is ", images_to_process + 1)
 		if images_to_process == -1:
-			emit_signal("update_complete")
+			emit_signal("update_complete", index_id)
 			updating = false
 
 func is_updating() -> bool:
@@ -107,15 +113,14 @@ func _update_background():
 	if tile >= bg_sprite_array.size():
 		tile = 0
 		print("		BG tile > bg_sprite_array.size()!!! ", tile)
-	
+#	print("Printing tile ", tile)
 	bg_texture_array[tile].set_data(bg.get_rect(sprite_rect_array[tile]))
 	
 	images_to_process -= 1
 	
 	#When done updating the background, reset the trail_array
 	if images_to_process == -1:
-		print("		BG Update Complete")
-		emit_signal("update_complete")
+		emit_signal("update_complete", index_id)
 		updating = false
 
 #Assumes mask_pos is in global coordiates

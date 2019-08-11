@@ -6,7 +6,7 @@ var percent_colored = 0.0
 var bg_color = Color(0.0,0.0,0.0,1.0)
 
 export var LEVEL_SIZE = Vector2(16000,16000)	#Total size of the level and background
-export var BG_NODE_SIZE = 4000 		 #Size of an individual background node's image
+export var BG_NODE_SIZE = 2000 		 #Size of an individual background node's image
 export var BG_NODE_SPRITE_SIZE = 250 #Size of the sprites that make up the background node's. See BGHandler.gd for more
 
 var bg_node_array = [] 		#The array of nodes that hold and handle the background images
@@ -50,8 +50,10 @@ func _ready():
 			bg_node_array.append(bg_node.instance())
 			call_deferred("add_child", bg_node_array[curr_index])
 			bg_node_array[curr_index].position = node_position
+			bg_node_array[curr_index].index_id = curr_index
 			bg_node_array[curr_index].setup(BG_NODE_SIZE, BG_NODE_SPRITE_SIZE, bg_color)
 			bg_node_array[curr_index].connect("update_complete", self, "_on_BGNode_update_complete")
+			bg_node_array[curr_index].connect("update_start", self, "_on_BGNode_update_start")
 	
 	#Set up level walls
 	var v_wall_collision = RectangleShape2D.new()
@@ -74,9 +76,10 @@ func _ready():
 func _process(delta):
 	if Input.is_action_just_released("paint"):
 		if get_tree().paused == false:
-#			if !percent_thread.is_active(): #TODO: Make this not consume so much time. 
+			pass
+#			if !percent_thread.is_active():
 #				var bg_array = []
-#				for idx in range(bg_node_array.size()):
+#				for idx in range(bg_node_array.size()): #FIXME: Make this not consume so much time. 
 #					bg_array.append(Image.new())
 #					bg_array[idx].copy_from(bg_node_array[idx].bg)
 #				percent_thread.start(self, "percent_calc", bg_array)
@@ -86,24 +89,32 @@ func _process(delta):
 				if bua_1_in_use == false:
 					bg_nodes_to_process = bg_updated_array_1.size() - 1
 					bua_1_in_use = true
-					curr_node = bg_updated_array_1.pop_back()
+					curr_node = bg_updated_array_1.back()
 				else:
 					bg_nodes_to_process = bg_updated_array_2.size() - 1
 					bua_1_in_use = false
-					curr_node = bg_updated_array_2.pop_back()
+					curr_node = bg_updated_array_2.back()
+				print("Forced Background Update: Release")
 				print("Nodes to Process is ", bg_nodes_to_process + 1)
+				print("Calling node ", curr_node)
+				bg_node_array[curr_node].start_sprite_update()
+
 				if curr_node < 0:
 					print("Curr node < 0: ", curr_node)
 				if curr_node >= bg_node_array.size():
 					print("curr node > bg_node_array.size(): ", curr_node)
-				print("	Processing node ", curr_node)
 				
-				bg_node_array[curr_node].start_sprite_update()
 		
 	if Input.is_action_just_pressed("save_background"): #TODO: Move save into a thread
+		get_tree().paused = true
 		var curr_time = OS.get_datetime()
-		var image_name = str(curr_time.day) + "_" + str(curr_time.month) + "_" + str(curr_time.year) + "_" + str(curr_time.hour) + "_" + str(curr_time.minute) + "_" + str(curr_time.second) + ".png"
-#		get_full_bg_image().save_png(image_name) #NOTE: BG Expansion Point
+		var image_name = "../" + str(curr_time.month) + "_" + str(curr_time.day) + "_" + str(curr_time.year) + "_" + str(curr_time.hour) + "_" + str(curr_time.minute) + "_" + str(curr_time.second) + ".png"
+		var bg_image_array = []
+		for idx in range(bg_node_array.size()): #FIXME: Make this not consume so much time. 
+			bg_image_array.append(Image.new())
+			bg_image_array[idx].copy_from(bg_node_array[idx].bg)
+		make_bg_image_from_array(bg_image_array).save_png(image_name) #NOTE: BG Expansion Point
+		get_tree().paused = false
 
 	if Input.is_action_just_pressed("zoom_out"):
 		get_tree().paused = true
@@ -169,32 +180,59 @@ func _on_TrailHandler_main_empty():
 			bg_nodes_to_process = bg_updated_array_2.size() - 1
 			bua_1_in_use = false
 			curr_node = bg_updated_array_2.pop_back()
+		print("Forced Background Update: Trail")
 		print("Nodes to Process is ", bg_nodes_to_process + 1)
+		print("Calling node ", curr_node)
 		if curr_node < 0:
 			print("Curr node < 0: ", curr_node)
 		if curr_node >= bg_node_array.size():
 			print("curr node > bg_node_array.size(): ", curr_node)
-		print("	Processing node ", curr_node)
-		
 		bg_node_array[curr_node].start_sprite_update()
 	
-	if !percent_thread.is_active() && get_tree().paused == false:
-		var bg_array = []
-		for idx in range(bg_node_array.size()):
-			bg_array.append(Image.new())
-			bg_array[idx].copy_from(bg_node_array[idx].bg)
-		percent_thread.start(self, "percent_calc", bg_array)
+#	if !percent_thread.is_active() && get_tree().paused == false: 
+#		var bg_array = []
+#		for idx in range(bg_node_array.size()): #FIXME: Make this not consume so much time. 
+#			bg_array.append(Image.new())
+#			bg_array[idx].copy_from(bg_node_array[idx].bg)
+#		percent_thread.start(self, "percent_calc", bg_array)
 
-func _on_BGNode_update_complete(): #NOTE: BG Expansion Point
+func _on_BGNode_update_start(node_idx: int):
+	print("Node Starting Update: ", node_idx)
+	if bg_nodes_to_process == -1:
+		if bua_1_in_use && bg_updated_array_1.find(node_idx) != -1:
+			bg_updated_array_1.erase(node_idx)
+		if !bua_1_in_use && bg_updated_array_2.find(node_idx) != -1:
+			bg_updated_array_2.erase(node_idx)
+
+func _on_BGNode_update_complete(node_idx: int): #NOTE: BG Expansion Point
+	print("Node Ending Update: ", node_idx)
+	if bg_nodes_to_process == -1: #Means a bg_node finished it's update from a self call.
+		if node_idx == -1:
+			print("node_idx ERROR")
+		if bg_updated_array_1.find(node_idx) != -1:
+			bg_updated_array_1.erase(node_idx)
+		if bg_updated_array_2.find(node_idx) != -1:
+			bg_updated_array_2.erase(node_idx)
+		return
+	
 	bg_nodes_to_process -= 1
 	if bg_nodes_to_process == -1:
 		$TrailHandler.hide_trail()
 		print("Node processing complete")
 		print(" ")
-		print($Cloud.get_viewport_rect())
 	else:
+		if bua_1_in_use:
+			if bg_updated_array_1.find(node_idx) != -1:
+				bg_updated_array_1.erase(node_idx)
+			if bg_updated_array_1.size() == 0:
+				return
+		else:
+			if bg_updated_array_2.find(node_idx) != -1:
+				bg_updated_array_2.erase(node_idx)
+			if bg_updated_array_2.size() == 0:
+				return
 		var curr_node = -1
-		if bua_1_in_use == true:
+		if bua_1_in_use:
 			curr_node = bg_updated_array_1.pop_back()
 		else:
 			curr_node = bg_updated_array_2.pop_back()
@@ -203,7 +241,7 @@ func _on_BGNode_update_complete(): #NOTE: BG Expansion Point
 			print("Curr node < 0")
 		if curr_node >= bg_node_array.size():
 			print("curr node > bg_node_array.size()")
-		print("	Processing node ", curr_node)
+		print("Calling node ", curr_node)
 		bg_node_array[curr_node].start_sprite_update()
 
 func make_bg_image_from_array(image_array: Array) -> Image:
