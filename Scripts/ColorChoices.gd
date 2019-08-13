@@ -47,5 +47,3 @@ func _close():
 			return
 	hide()
 	emit_signal("hide")
-	
-

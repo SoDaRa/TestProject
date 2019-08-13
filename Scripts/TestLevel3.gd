@@ -8,7 +8,7 @@ var scale_bg_image_by = Vector2(1.0,1.0)
 
 var bg_color = Color(0.0,0.0,0.0,1.0)
 
-export var LEVEL_SIZE = Vector2(3111,2000)	#Total size of the level and background
+export var LEVEL_SIZE = Vector2(4000,4000)	#Total size of the level and background
 export var BG_NODE_SIZE = 1000 		 #Size of an individual background node's image
 export var BG_NODE_SPRITE_SIZE = 500 #Size of the sprites that make up the background node's. See BGHandler.gd for more
 
@@ -25,16 +25,16 @@ var bg_nodes_to_process = -1
 var player_camera
 
 var zoom_camera_position: Vector2
-var zoom_camera_scale = Vector2(6.8,6.8)
+var zoom_camera_scale = Vector2(6.8,6.8) #TODO: Have this be set programatically
 
 var wall_width = 100
 
 func _on_Root_ready(): #TODO: Will need to fix this when loading levels
 	player_camera = get_node("../Player/PlayerBody/Camera2D")
-#	player_camera.limit_top = 0
-#	player_camera.limit_bottom = LEVEL_SIZE.y
-#	player_camera.limit_left = 0
-#	player_camera.limit_right = LEVEL_SIZE.x
+	player_camera.limit_top = 0
+	player_camera.limit_bottom = LEVEL_SIZE.y
+	player_camera.limit_left = 0
+	player_camera.limit_right = LEVEL_SIZE.x
 	zoom_camera_position = Vector2(LEVEL_SIZE.x/2, LEVEL_SIZE.y/2)
 	
 	get_node("../Player/PlayerBody").position = $Position2D.position
@@ -139,10 +139,10 @@ func _process(delta):
 	if Input.is_action_just_released("zoom_out"):
 		get_tree().paused = false
 		player_camera._reset()
-#		player_camera.limit_top = 0
-#		player_camera.limit_bottom = LEVEL_SIZE.y
-#		player_camera.limit_left = 0
-#		player_camera.limit_right = LEVEL_SIZE.x
+		player_camera.limit_top = 0
+		player_camera.limit_bottom = LEVEL_SIZE.y
+		player_camera.limit_left = 0
+		player_camera.limit_right = LEVEL_SIZE.x
 
 # warning-ignore:unused_argument
 func percent_calc(num: int):

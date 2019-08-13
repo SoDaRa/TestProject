@@ -92,5 +92,3 @@ func _on_Timer_timeout():
 #		print(my_transform)
 #		print(new_transform)
 #		state.set_transform(new_transform)
-
-
