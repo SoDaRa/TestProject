@@ -31,6 +31,7 @@ Notes:
 - DON'T make edges of platforms black
 - Never set PlayerMask to invisible. Stops painting from working
 - Make sure Player's paint signal is connected to something to paint
+- Don't set the level size to 32000x32000. Not that it doesn't work, but zooming out lags like crazy and probably isn't worth being THAT large
 - Dummy_Button is just a button to test a feature without having to worry about any other input and SHOULD BE REMOVED IN FINAL BUILD!!!
 
 Dialogue Tree Notes:

@@ -30,7 +30,7 @@ var curr_max_size = 75 #This will be used to cap how large the player can grow a
 signal paint(mask, mask_pos, player_color)
 
 onready var MaskSprite = get_node("PlayerMask/Viewport/PMSpriteScale/PMSprite")
-onready var RigidCollision= get_node("RigidBody2D/CollisionShape2D")
+onready var RigidCollision= get_node("PlayerBody/CollisionShape2D")
 onready var MySprite = get_node("SpriteScale/Sprite")
 
 #NOTE: Due to player now being a Node instead of a RigidBody, the level should have a Position2D to specify where it should start.
@@ -101,14 +101,14 @@ func _process(delta):
 
 # warning-ignore:unused_argument
 func _physics_process(delta):
-	$SpriteScale.position = $RigidBody2D.position
-	MySprite.rotation_degrees = $RigidBody2D.rotation_degrees
+	$SpriteScale.position = $PlayerBody.position
+	MySprite.rotation_degrees = $PlayerBody.rotation_degrees
 	
 	if Input.is_action_pressed("paint") && get_tree().paused == false:
 		if curr_shape != BALL_MODE: #Get rotation if not a ball
 			MaskSprite.rotation_degrees = MySprite.rotation_degrees
 		var my_mask = $PlayerMask/Viewport.get_texture().get_data()
-		var mask_pos = $RigidBody2D.position - Vector2(my_mask.get_width() / 2.0,my_mask.get_height() / 2.0)
+		var mask_pos = $PlayerBody.position - Vector2(my_mask.get_width() / 2.0,my_mask.get_height() / 2.0)
 		emit_signal("paint", my_mask, mask_pos, color_sequence[curr_color])
 		#NOTE: Don't turn off PlayerMask Visibility
 		#NOTE: Be sure the paint signal is connected to the level!!

@@ -5,11 +5,13 @@ export var TRAIL_LENGTH = 300
 var trail_array = []  				#Main Trail array
 var trail_idx = TRAIL_LENGTH - 1 	#Keeps track of which main trail sprite is to be used next
 
-export var BUFFER_LENGTH = 400
+export var BUFFER_LENGTH = 300
 var buffer_1 = []
 var buffer_2 = []
 var buffer_idx = BUFFER_LENGTH - 1 	#Keeps track of which buffer trail sprite is to be used next
 var buffer_1_in_use = false 		#Refers to if buffer_1 is currently displayed
+
+var use_main = true	#This is just used to swap to using the buffer for updates not triggered by using up the main trail
 
 signal main_empty
 
@@ -51,11 +53,12 @@ func hide_trail():
 		buffer_1_in_use = true
 	else:
 		buffer_1_in_use = false
-	print("Trail Clear")
+	use_main = true
+#	print("Trail Clear")
 
 func draw_trail(mask: Image, mask_pos:Vector2, player_color:Color):
 	var mask_info = {"pos": mask_pos, "image": mask, "color": player_color}
-	if trail_idx != -1:
+	if trail_idx != -1 && use_main:
 		_draw_main(mask_info)
 	else:
 		_draw_buffer(mask_info)
@@ -66,7 +69,7 @@ func _draw_main(mask_info: Dictionary):
 	_update_sprite(trail_array[trail_idx], mask_info)
 	trail_idx -= 1
 	
-	#Start setting the background sprites
+	#Warn that you're able to use the buffer. This is used to start a background update.
 	if trail_idx == -1:
 		emit_signal("main_empty")
 
@@ -97,3 +100,6 @@ func _update_sprite(to_update: Sprite, mask_info: Dictionary):
 	
 	to_update.position = mask_info["pos"]
 	to_update.texture = sprite_texture
+	
+func swap_to_buffer():
+	use_main = false

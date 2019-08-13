@@ -1,9 +1,9 @@
 extends Node2D
 
-#Default Background Color
-var bg_color: Color
-var BG_SIZE: int 		#NOTE: Must be wholly divisible by BG_SPRITE_SIZE
-var BG_SPRITE_SIZE: int	#BG sprite dimensions. For now x and y length will be equal
+
+var bg_color: Color			#Default Background Color
+var BG_SIZE: Vector2 		#Background size
+var BG_SPRITE_SIZE: Vector2	#Sprite size
 
 var bg: Image				#Image for background
 var bg_texture_array = [] 	#Array of Textures to apply crops of the bg image onto
@@ -24,10 +24,12 @@ var updating = false
 #var draw_frame = true
 #var count = 0
 
+var scale_by = Vector2(1.0,1.0)
+
 var index_id = -1 #Used to signal where it is in the level's bg_node_array
 
-signal update_start(id)
-signal update_complete(id)
+#signal update_start(id)
+signal update_complete(bg_copy, id)
 	
 # warning-ignore:unused_argument
 func _process(delta):
@@ -45,37 +47,54 @@ func _process(delta):
 #			draw_frame = true
 #			count = 0
 
-func setup(image_size:int, sprite_size:int, background_color:Color):
+func setup(image_size:Vector2, sprite_size:Vector2, background_color:Color, scale_: Vector2):
 	BG_SIZE = image_size
 	BG_SPRITE_SIZE = sprite_size
 	bg_color = background_color
-#	$VisibilityNotifier2D.rect = Rect2(self.position, Vector2(BG_SIZE, BG_SIZE))
+	scale_by = scale_
+#	$VisibilityNotifier2D.rect = Rect2(self.position, Vector2(BG_SIZE.x, BG_SIZE.y))
+	
 	if bg == null:
 		bg = Image.new()
-		bg.create(BG_SIZE, BG_SIZE, false, Image.FORMAT_RGB8)
+		bg.create(int(BG_SIZE.x), int(BG_SIZE.y), false, Image.FORMAT_RGB8)
 		bg.fill(bg_color)
+		
+	if BG_SPRITE_SIZE.x > BG_SIZE.x:
+		BG_SPRITE_SIZE.x = BG_SIZE.x
+	if BG_SPRITE_SIZE.y > BG_SIZE.y:
+		BG_SPRITE_SIZE.y = BG_SIZE.y
+#	if BG_SPRITE_SIZE != sprite_size:
+#		print("	Sprite size is ", BG_SPRITE_SIZE)
 	
-	array_width = int(bg.get_width() / BG_SPRITE_SIZE)
-	array_height = int(bg.get_height() / BG_SPRITE_SIZE)
+	array_width = int(ceil(bg.get_width() / BG_SPRITE_SIZE.x))
+	array_height = int(ceil(bg.get_height() / BG_SPRITE_SIZE.y))
 	
-	for x in range(array_width): #HACK Consider ways to divide up background for non-1000x1000 sizes
+	for x in range(array_width):
 		for y in range(array_height):
 			var curr_index = (x * array_height) + y
-			var sprite_rect = Rect2(Vector2(x * BG_SPRITE_SIZE, y * BG_SPRITE_SIZE), Vector2(BG_SPRITE_SIZE, BG_SPRITE_SIZE))
+			var curr_sprite_position = Vector2(x * BG_SPRITE_SIZE.x, y * BG_SPRITE_SIZE.y)
+			var curr_sprite_size = BG_SPRITE_SIZE
+			
+			if curr_sprite_position.x + BG_SPRITE_SIZE.x > BG_SIZE.x:
+				curr_sprite_size.x = BG_SIZE.x - curr_sprite_position.x
+			if curr_sprite_position.y + BG_SPRITE_SIZE.y > BG_SIZE.y:
+				curr_sprite_size.y = BG_SIZE.y - curr_sprite_position.y
+			
+			var curr_sprite_rect = Rect2(curr_sprite_position, curr_sprite_size)
 			
 			bg_texture_array.append(ImageTexture.new())
-			bg_texture_array[curr_index].create_from_image(bg.get_rect(sprite_rect), 5) #5 is to set the flags so the texture isn't repeating
+			bg_texture_array[curr_index].create_from_image(bg.get_rect(curr_sprite_rect), 5) #5 is to set the flags so the texture isn't repeating
 			
 			bg_sprite_array.append(Sprite.new())
 			call_deferred("add_child", bg_sprite_array[curr_index])
-			bg_sprite_array[curr_index].position = Vector2(x * BG_SPRITE_SIZE, y * BG_SPRITE_SIZE)
+			bg_sprite_array[curr_index].position = curr_sprite_position
 			bg_sprite_array[curr_index].texture = bg_texture_array[curr_index]
 			bg_sprite_array[curr_index].z_index = -2000
 			bg_sprite_array[curr_index].centered = false
 			
-			sprite_rect_array.append(sprite_rect)
+			sprite_rect_array.append(curr_sprite_rect)
 
-func start_sprite_update(): #NOTE: Is called from $VisibilityNotifier2D screen_exited()
+func start_sprite_update():
 	if !updating:
 		if paint_1_in_use == false:
 			images_to_process = paint_array_1.size() - 1
@@ -86,10 +105,16 @@ func start_sprite_update(): #NOTE: Is called from $VisibilityNotifier2D screen_e
 			images_to_process = paint_array_2.size() - 1
 			paint_1_in_use = false
 			updating = true
-		emit_signal("update_start", index_id)
-		print("		Images to Process is ", images_to_process + 1)
+#		emit_signal("update_start", index_id)
+#		print("		Images to Process is ", images_to_process + 1)
 		if images_to_process == -1:
-			emit_signal("update_complete", index_id)
+			var my_bg_copy = Image.new()
+			my_bg_copy.copy_from(bg)
+			if scale_by != Vector2(1.0,1.0):
+				var width = bg.get_width() * scale_by.x
+				var height = bg.get_height() * scale_by.y
+				my_bg_copy.resize(width, height, Image.INTERPOLATE_NEAREST)
+			emit_signal("update_complete", my_bg_copy, index_id)
 			updating = false
 
 func is_updating() -> bool:
@@ -120,7 +145,13 @@ func _update_background():
 	
 	#When done updating the background, reset the trail_array
 	if images_to_process == -1:
-		emit_signal("update_complete", index_id)
+		var my_bg_copy = Image.new()
+		my_bg_copy.copy_from(bg)
+		if scale_by != Vector2(1.0,1.0):
+			var width = int(bg.get_width() * scale_by.x)
+			var height = int(bg.get_height() * scale_by.y)
+			my_bg_copy.resize(width, height, Image.INTERPOLATE_NEAREST)
+		emit_signal("update_complete", my_bg_copy, index_id)
 		updating = false
 
 #Assumes mask_pos is in global coordiates
@@ -137,10 +168,10 @@ func paint_background(mask:Image, mask_pos:Vector2, curr_color:Color):
 #More certain way to do this would be to use sprite_rect_array.clip but worried it'd cause lag if done too often.
 func check_painted(mask_pos:Vector2, width:float, height:float):
 	#Get left, top, right and bottom
-	var left = int(floor(mask_pos.x / BG_SPRITE_SIZE))
-	var top = int(floor(mask_pos.y / BG_SPRITE_SIZE))
-	var right = int(floor((mask_pos.x + width) / BG_SPRITE_SIZE))
-	var bottom = int(floor((mask_pos.y + height) / BG_SPRITE_SIZE))
+	var left = int(floor(mask_pos.x / BG_SPRITE_SIZE.x))
+	var top = int(floor(mask_pos.y / BG_SPRITE_SIZE.y))
+	var right = int(floor((mask_pos.x + width) / BG_SPRITE_SIZE.x))
+	var bottom = int(floor((mask_pos.y + height) / BG_SPRITE_SIZE.y))
 	
 	#Figure out which sprites each of the four corners are in
 	var topleft = int(left * array_height + top)
@@ -149,11 +180,11 @@ func check_painted(mask_pos:Vector2, width:float, height:float):
 	var bottomright = int(right * array_height + bottom)
 	
 	#These are just to avoid redundant find calls if two corners are in the same section or one is out of bounds
-	var skip_topleft = left < 0 || top < 0 || topleft < 0
-	var skip_topright = topleft == topright || right >= array_width || top < 0 || topright >= bg_sprite_array.size()
-	var skip_bottomleft = topleft == bottomleft || bottom >= array_height || left < 0 || bottomleft >= bg_sprite_array.size()
+	var skip_topleft = left < 0 || top < 0 || topleft < 0 || topleft >= bg_sprite_array.size()
+	var skip_topright = topleft == topright || right >= array_width || top < 0 || topright < 0 || topright >= bg_sprite_array.size()
+	var skip_bottomleft = topleft == bottomleft || bottom >= array_height || left < 0 || bottomleft < 0 || bottomleft >= bg_sprite_array.size()
 	var skip_bottomright = (bottomright == topright) || (bottomright == bottomleft) || right >= array_width || bottom >= array_height 
-	skip_bottomright = skip_bottomright || bottomright >= bg_sprite_array.size()
+	skip_bottomright = skip_bottomright || bottomright < 0 || bottomright >= bg_sprite_array.size()
 	
 	if paint_1_in_use == false:
 		if !skip_topleft:

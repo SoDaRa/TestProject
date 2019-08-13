@@ -44,6 +44,6 @@ func _on_Area2D_body_entered(body):
 		update()
 
 func _on_Area2D_body_exited(body):
-	if body.get("name") == "Player":
+	if body.get("name") == "PlayerBody":
 		player_in_range = false
 		update()
