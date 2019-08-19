@@ -96,7 +96,7 @@ func _update_sprite(to_update: Sprite, mask_info: Dictionary):
 	player_image.blit_rect_mask(player_color, mask_info["image"], Rect2(0,0,mask_info["image"].get_width(), mask_info["image"].get_height()), Vector2(0,0))
 	
 	var sprite_texture = ImageTexture.new()
-	sprite_texture.create_from_image(player_image)
+	sprite_texture.create_from_image(player_image, 5)
 	
 	to_update.position = mask_info["pos"]
 	to_update.texture = sprite_texture

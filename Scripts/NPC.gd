@@ -39,7 +39,7 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 		state.apply_central_impulse(self.position.direction_to(home) * self.position.distance_to(home) * .3)
 
 func _on_Area2D_body_entered(body):
-	if body.get("name") == "Player": #NOTE: Player must be named Player to work!!
+	if body.get("name") == "PlayerBody": #NOTE: Player must be named Player to work!!
 		player_in_range = true #TODO: Add an ! and ... sprite to NPC to show they are able to be talked to.
 		update()
 

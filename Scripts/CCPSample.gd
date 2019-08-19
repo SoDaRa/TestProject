@@ -11,7 +11,15 @@ func _ready():
 	self.material = my_material
 
 func _gui_input(event):
-	if event is InputEventMouseButton:
-		emit_signal("mouse_input", event.position)
-		pass
-	pass
+	if event is InputEventMouse:
+		if event.get_button_mask() & BUTTON_MASK_LEFT:
+			var m_pos = event.position
+			if m_pos.x > 255:
+				m_pos.x = 255
+			elif m_pos.x < 0:
+				m_pos.x = 0
+			if m_pos.y > 255:
+				m_pos.y = 255
+			elif m_pos.y < 0:
+				m_pos.y = 0
+			emit_signal("mouse_input", m_pos)

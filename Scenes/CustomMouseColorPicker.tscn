@@ -41,6 +41,7 @@ margin_bottom = 468.0
 [node name="ColorWheel" type="TextureRect" parent="VBox/Main/Display"]
 margin_right = 468.0
 margin_bottom = 468.0
+mouse_filter = 0
 texture = ExtResource( 3 )
 script = ExtResource( 4 )
 
@@ -75,6 +76,7 @@ z_index = 1
 texture = ExtResource( 6 )
 
 [node name="PresetBar" type="HBoxContainer" parent="VBox"]
+editor/display_folded = true
 margin_top = 472.0
 margin_right = 522.0
 margin_bottom = 512.0

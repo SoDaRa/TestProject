@@ -13,13 +13,17 @@ var box_sprite = preload("res://Sprites/box.png")
 var ball_sprite = preload("res://Sprites/ball.png")
 var walrus_sprite = preload("res://Sprites/walrus.png")
 var tri_sprite = preload("res://Sprites/triangle.png")
-var custom_sprite
+var custom_image = Image.new()
+var custom_sprite = ImageTexture.new()
 
 var collision_outline_shader = preload("res://PlayerCollisionOutlineShader.tres")
 
 enum {BOX_MODE, BALL_MODE, TRI_MODE, WALRUS_MODE, CUSTOM_MODE}   
-
 export var curr_shape = BALL_MODE
+
+var level_rect = Rect2(Vector2(0,0), Vector2(100,100)) 	#Used to define where out of bounds is
+var last_valid_position = Vector2(0,0)					#Used to get back in bounds if out of bounds
+var tolerance = 50										#How far the player can travel out of bounds before being snapped inbounds
 
 #Size Changing
 var BASE_SIZE = 50 #This represents the player being 1-to-1 with the image file's pixel size.
@@ -37,10 +41,15 @@ onready var MySprite = get_node("SpriteScale/Sprite")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-#	custom_sprite = load("user://custom.png")
-	if custom_sprite == null:
-		custom_sprite = load("res://Sprites/default_custom.png")
-	if custom_sprite.get_size() != box_sprite.get_size():
+	var custom_path = "custom.png"
+	var file_checker = File.new()
+	if file_checker.file_exists(custom_path):
+		var err = custom_image.load(custom_path)
+		if err || custom_image.is_empty() || custom_image.is_invisible() || custom_image.get_size() != box_sprite.get_size():
+			custom_sprite = load("res://Sprites/default_custom.png")
+		else:
+			custom_sprite.create_from_image(custom_image, 5)
+	else:
 		custom_sprite = load("res://Sprites/default_custom.png")
 	MySprite.modulate = color_sequence[curr_color]
 	update_shape()
@@ -48,9 +57,23 @@ func _ready():
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 # warning-ignore:unused_argument
 func _process(delta):
+	var my_position = $PlayerBody.position
+	var level_start = level_rect.position
+	var level_end = level_rect.end
+	var is_in_bounds = level_rect.has_point(my_position)
+	var is_out_of_bounds = my_position.x < level_start.x - tolerance || my_position.y < level_start.y - tolerance 
+	is_out_of_bounds = is_out_of_bounds || my_position.x > level_end.x + tolerance || my_position.y > level_end.y + tolerance
+	
+	if is_in_bounds:
+		last_valid_position = $PlayerBody.position
+	if is_out_of_bounds:
+		if level_rect.has_point(last_valid_position):
+			$PlayerBody.position = last_valid_position
+		else: #If somehow the last_valid_position isn't within the level_rect, then default to it's top left corner.
+			$PlayerBody.position = level_rect.position
+	
 #	if Input.is_action_just_pressed("Dummy_Button"):
-#		color_sequence.append(Color(0.5,0.5,0.5,1.0))
-#		$ColorChoices/CenterContainer/GridContainer._add_color()
+#		$PlayerBody.position = Vector2(-1000,-1000)
 		
 	if curr_shape != BALL_MODE: #Get rotation if not a ball
 		MaskSprite.rotation_degrees = MySprite.rotation_degrees
@@ -154,8 +177,6 @@ func update_shape():
 			MySprite.texture = custom_sprite
 			MaskSprite.texture = custom_sprite
 			MySprite.material = collision_outline_shader
-
-
 
 func _on_RigidBody2D_jumping():
 	if $SpriteScale/AnimationPlayer.is_playing():

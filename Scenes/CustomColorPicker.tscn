@@ -1,6 +1,6 @@
 [gd_scene load_steps=14 format=2]
 
-[ext_resource path="res://Scripts/JoyPadColorPicker.gd" type="Script" id=1]
+[ext_resource path="res://Scripts/CustomColorPicker.gd" type="Script" id=1]
 [ext_resource path="res://Scripts/CCPMainDisplay.gd" type="Script" id=2]
 [ext_resource path="res://JoyPadColorPickerSprites/SlimColorWheelwOutlineFit.png" type="Texture" id=3]
 [ext_resource path="res://Scripts/CCPColorWheel.gd" type="Script" id=4]
@@ -15,7 +15,7 @@
 
 [sub_resource type="Theme" id=1]
 
-[node name="JoyPadColorPicker" type="PanelContainer"]
+[node name="CustomColorPicker" type="PanelContainer"]
 margin_right = 536.0
 margin_bottom = 526.0
 script = ExtResource( 1 )

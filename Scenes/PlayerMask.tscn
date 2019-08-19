@@ -3,12 +3,12 @@
 [ext_resource path="res://JumpAnimation.tres" type="Animation" id=1]
 
 [node name="VC" type="ViewportContainer"]
-margin_right = 75.0
-margin_bottom = 75.0
+margin_right = 110.0
+margin_bottom = 110.0
 stretch = true
 
 [node name="Viewport" type="Viewport" parent="."]
-size = Vector2( 75, 75 )
+size = Vector2( 110, 110 )
 transparent_bg = true
 handle_input_locally = false
 disable_3d = true

@@ -1,33 +1,35 @@
 extends Node
 
-var percent_thread = Thread.new() #Thread for processing percent
+var percent_thread = Thread.new() 			#Thread for processing percent
+var save_background_thread = Thread.new()	#Thread for saving the background
 var percent_colored = 0.0
+var save_bg_next_pass = false
 
-var image_array = []
+var image_array = []					#Holds the various background images after an update. Copied to threads for use
 var scale_bg_image_by = Vector2(1.0,1.0)
 
 var bg_color = Color(0.0,0.0,0.0,1.0)
 
 export var LEVEL_SIZE = Vector2(4000,4000)	#Total size of the level and background
-export var BG_NODE_SIZE = 1000 		 #Size of an individual background node's image
-export var BG_NODE_SPRITE_SIZE = 500 #Size of the sprites that make up the background node's. See BGHandler.gd for more
+export var BG_NODE_SIZE = 500 				#Size of an individual background node's image
+export var BG_NODE_SPRITE_SIZE = 250 		#Size of the sprites that make up the background node's. See BGHandler.gd for more
+var MAX_IMAGE_SIZE = Vector2(16000, 16000)	#Max size an Image can be. It can go up to 16384x16384, but I'd rather stay under that
 
 var bg_node_array = [] 		#The array of nodes that hold and handle the background images
-var node_array_width
-var node_array_height
+var node_array_width		#How many columns the array has
+var node_array_height		#How many rows the array has
 var bg_node = preload("res://Scenes/BGNode.tscn")
 
-var bg_updated_array_1 = []
-var bg_updated_array_2 = []
-var bua_1_in_use = false #bua = bg_updated_array
+var bg_updated_array_1 = []	#These two arrays keep track of which bg_nodes have been painted on and swap duties with one building up while
+var bg_updated_array_2 = []	#nodes are being painted on and the other shrinks as it's used for an update.
+var bua_1_in_use = false 	#bua = bg_updated_array
 var bg_nodes_to_process = -1
 
 var player_camera
-
 var zoom_camera_position: Vector2
-var zoom_camera_scale = Vector2(6.8,6.8) #TODO: Have this be set programatically
+var zoom_camera_scale = Vector2(6.8,6.8) #TODO: Have this be set programatically based on LEVEL_SIZE
 
-var wall_width = 100
+var wall_width = 50	#How wide the borders of the level are.
 
 func _on_Root_ready(): #TODO: Will need to fix this when loading levels
 	player_camera = get_node("../Player/PlayerBody/Camera2D")
@@ -38,6 +40,7 @@ func _on_Root_ready(): #TODO: Will need to fix this when loading levels
 	zoom_camera_position = Vector2(LEVEL_SIZE.x/2, LEVEL_SIZE.y/2)
 	
 	get_node("../Player/PlayerBody").position = $Position2D.position
+	get_node("../Player").level_rect = Rect2(Vector2(0,0), LEVEL_SIZE)
 	
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -45,10 +48,10 @@ func _ready():
 	node_array_width = int(ceil(LEVEL_SIZE.x / BG_NODE_SIZE))
 	node_array_height = int(ceil(LEVEL_SIZE.y / BG_NODE_SIZE))
 	
-	if LEVEL_SIZE.x > 16000:
-		scale_bg_image_by.x = 16000 / LEVEL_SIZE.x
-	if LEVEL_SIZE.y > 16000:
-		scale_bg_image_by.y = 16000 / LEVEL_SIZE.y
+	if LEVEL_SIZE.x > MAX_IMAGE_SIZE.x:
+		scale_bg_image_by.x = MAX_IMAGE_SIZE.x / LEVEL_SIZE.x
+	if LEVEL_SIZE.y > MAX_IMAGE_SIZE.y:
+		scale_bg_image_by.y = MAX_IMAGE_SIZE.y / LEVEL_SIZE.y
 	
 	for x in range(node_array_width):
 		for y in range(node_array_height):
@@ -84,7 +87,7 @@ func _ready():
 	$Borders/RightWall/CollisionShape2D.shape = v_wall_collision
 	$Borders/Ceiling/CollisionShape2D.shape = h_wall_collision
 	$Borders/Floor/CollisionShape2D.shape = h_wall_collision
-	
+
 	$Borders/LeftWall.position = Vector2(-wall_width, LEVEL_SIZE.y/2)
 	$Borders/Ceiling.position = Vector2(LEVEL_SIZE.x/2, -wall_width)
 	$Borders/RightWall.position = Vector2(LEVEL_SIZE.x+wall_width, LEVEL_SIZE.y/2)
@@ -92,40 +95,22 @@ func _ready():
 
 # warning-ignore:unused_argument
 func _process(delta):
-	if Input.is_action_just_pressed("Dummy_Button"):
-		var num_1 = ceil(LEVEL_SIZE.x / BG_NODE_SIZE)
-		print(num_1)
+#	if Input.is_action_just_pressed("Dummy_Button"):
+#		var num_1 = ceil(LEVEL_SIZE.x / BG_NODE_SIZE)
+#		print(num_1)
 	if Input.is_action_just_released("paint"):
 		if get_tree().paused == false:
 			if bg_nodes_to_process == -1:
-				var curr_node = -1
-				if bua_1_in_use == false:
-					bg_nodes_to_process = bg_updated_array_1.size() - 1
-					bua_1_in_use = true
-					curr_node = bg_updated_array_1.pop_back()
-				else:
-					bg_nodes_to_process = bg_updated_array_2.size() - 1
-					bua_1_in_use = false
-					curr_node = bg_updated_array_2.pop_back()
-#				print("Forced Background Update: Release")
-#				print("Nodes to Process is ", bg_nodes_to_process + 1)
-#				print("Calling node ", curr_node)
-				bg_node_array[curr_node].start_sprite_update()
-				
-				if curr_node < 0:
-					print("Curr node < 0: ", curr_node)
-				if curr_node >= bg_node_array.size():
-					print("curr node > bg_node_array.size(): ", curr_node)
+#				print("Background Update: Release")
+				start_update()
 				$TrailHandler.swap_to_buffer()
 		
-	if Input.is_action_just_pressed("save_background"): #TODO: Move save into a thread
-		get_tree().paused = true
-		var curr_time = OS.get_datetime()
-		var image_name = "../" + str(curr_time.month) + "_" + str(curr_time.day) + "_" + str(curr_time.year) + "_" 
-		image_name = image_name + str(curr_time.hour)  + "_" + str(curr_time.minute) + "_" + str(curr_time.second) + ".png"
-		var my_bg = bg_from_array(image_array)
-		my_bg.save_png(image_name)
-		get_tree().paused = false
+	if Input.is_action_just_pressed("save_background"):
+		var bg_updated = bg_nodes_to_process == -1 && bg_updated_array_1.size() == 0 && bg_updated_array_2.size() == 0
+		if !save_background_thread.is_active() && get_tree().paused == false && bg_updated: 
+			save_background_thread.start(self, "save_background", image_array)
+		elif !save_background_thread.is_active() && get_tree().paused == false && !bg_updated: 
+			save_bg_next_pass = true #Shouldn't do it right now but will do it after next update is complete
 
 	if Input.is_action_just_pressed("zoom_out"):
 		get_tree().paused = true
@@ -145,9 +130,9 @@ func _process(delta):
 		player_camera.limit_right = LEVEL_SIZE.x
 
 # warning-ignore:unused_argument
-func percent_calc(num: int):
+func percent_calc(my_img_array: Array):
 	var count = 0.0
-	var compressed_image = bg_from_array(image_array, true)
+	var compressed_image = bg_from_array(my_img_array, true)
 	compressed_image.lock()
 	for x in range(100):
 		for y in range(100):
@@ -164,6 +149,18 @@ func percent_calc_done():
 	print(percentage, "%")
 	if percentage > percent_colored:
 		percent_colored = percentage
+
+func save_background(my_img_array: Array):
+	var curr_time = OS.get_datetime()
+	var image_name = "MyImage" + str(curr_time.month) + "_" + str(curr_time.day) + "_" + str(curr_time.year) + "_" 
+	image_name = image_name + str(curr_time.hour)  + "_" + str(curr_time.minute) + "_" + str(curr_time.second) + ".png"
+	var my_bg = bg_from_array(my_img_array)
+	my_bg.save_png(image_name)
+	call_deferred("save_background_done")
+
+func save_background_done():
+	save_background_thread.wait_to_finish()
+	print("Background Save Complete")
 
 func _on_Player_paint(mask: Image, mask_pos: Vector2, player_color: Color):
 	$TrailHandler.draw_trail(mask, mask_pos, player_color)
@@ -182,23 +179,9 @@ func _on_Player_paint(mask: Image, mask_pos: Vector2, player_color: Color):
 	
 func _on_TrailHandler_main_empty():
 	if bg_nodes_to_process == -1:
-		var curr_node = -1
-		if bua_1_in_use == false:
-			bg_nodes_to_process = bg_updated_array_1.size() - 1
-			bua_1_in_use = true
-			curr_node = bg_updated_array_1.pop_back()
-		else:
-			bg_nodes_to_process = bg_updated_array_2.size() - 1
-			bua_1_in_use = false
-			curr_node = bg_updated_array_2.pop_back()
-#		print("Forced Background Update: Trail")
-#		print("Nodes to Process is ", bg_nodes_to_process + 1)
-#		print("Calling node ", curr_node)
-		if curr_node < 0:
-			print("Curr node < 0: ", curr_node)
-		if curr_node >= bg_node_array.size():
-			print("curr node > bg_node_array.size(): ", curr_node)
-		bg_node_array[curr_node].start_sprite_update()
+#		print("Background Update: Trail")
+		start_update()
+
 
 #func _on_BGNode_update_start(node_idx: int):
 #	print("Node Starting Update: ", node_idx)
@@ -210,14 +193,21 @@ func _on_TrailHandler_main_empty():
 
 func _on_BGNode_update_complete(bg_image:Image, node_idx: int):
 #	print("Node Ending Update: ", node_idx)
-	image_array[node_idx] = bg_image
+	image_array[node_idx] = bg_image #TODO: Make this not cause so much lagggg. Access sprites to get in chunks?
 	bg_nodes_to_process -= 1
+	
+	#Ending the update
 	if bg_nodes_to_process == -1:
 		$TrailHandler.hide_trail()
 		if !percent_thread.is_active() && get_tree().paused == false: 
-			percent_thread.start(self, "percent_calc", 1)
+			percent_thread.start(self, "percent_calc", image_array)
+		if save_bg_next_pass && !save_background_thread.is_active(): #If the user asked to save the background, then do it now that image_array is relatively up to date
+			save_background_thread.start(self, "save_background", image_array)
+			save_bg_next_pass = false
 #		print("Node processing complete")
 #		print(" ")
+	
+	#Continuing the update
 	else:
 		var curr_node = -1
 		if bua_1_in_use:
@@ -232,19 +222,42 @@ func _on_BGNode_update_complete(bg_image:Image, node_idx: int):
 #		print("Calling node ", curr_node)
 		bg_node_array[curr_node].start_sprite_update()
 
+func start_update():
+	var curr_node = -1
+	if bua_1_in_use == false:
+		bg_nodes_to_process = bg_updated_array_1.size() - 1
+		bua_1_in_use = true
+		curr_node = bg_updated_array_1.pop_back()
+	else:
+		bg_nodes_to_process = bg_updated_array_2.size() - 1
+		bua_1_in_use = false
+		curr_node = bg_updated_array_2.pop_back()
+#		print("Nodes to Process is ", bg_nodes_to_process + 1)
+#		print("Calling node ", curr_node)
+	if bg_nodes_to_process == -1 || curr_node == null:
+		print("Cancel Update")
+		return
+	if curr_node < 0:
+		print("Curr node < 0: ", curr_node)
+	if curr_node >= bg_node_array.size():
+		print("curr node > bg_node_array.size(): ", curr_node)
+	bg_node_array[curr_node].start_sprite_update()
+
 func bg_from_array(img_array: Array, should_resize = false, resize_width = 100, resize_height = 100) -> Image:
 	var my_bg = Image.new()
-	if LEVEL_SIZE.x <= 16000 && LEVEL_SIZE.y <= 16000: #16384 is the max height and width of an Image. But rather not push it past 16000.
+	if LEVEL_SIZE.x <= MAX_IMAGE_SIZE.x && LEVEL_SIZE.y <= MAX_IMAGE_SIZE.y: #16384 is the max height and width of an Image. But rather not push it past 16000.
 		my_bg.create(LEVEL_SIZE.x, LEVEL_SIZE.y, false, Image.FORMAT_RGB8)
 		for idx in range(img_array.size()):
 			if img_array[idx].get_data().size() == 0: #Prevents reading from an image that hasn't been set yet
 				continue
 			my_bg.blit_rect(img_array[idx], Rect2(0, 0, img_array[idx].get_width(), img_array[idx].get_height()), bg_node_array[idx].position)
 	else:
-		my_bg.create(16000, 16000, false, Image.FORMAT_RGB8)
+		my_bg.create(MAX_IMAGE_SIZE.x, MAX_IMAGE_SIZE.y, false, Image.FORMAT_RGB8)
 		for idx in range(img_array.size()): 
+			var img_position = bg_node_array[idx].position * scale_bg_image_by
+			img_position = Vector2(floor(img_position.x), floor(img_position.y))
 			#Output has seams. Probably difficult to fix.
-			my_bg.blit_rect(img_array[idx], Rect2(0, 0, img_array[idx].get_width(), img_array[idx].get_height()), bg_node_array[idx].position * scale_bg_image_by)
+			my_bg.blit_rect(img_array[idx], Rect2(0, 0, img_array[idx].get_width(), img_array[idx].get_height()), img_position)
 	if should_resize:
 		my_bg.resize(resize_width, resize_height, Image.INTERPOLATE_NEAREST)
 	return my_bg

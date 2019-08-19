@@ -35,17 +35,6 @@ signal update_complete(bg_copy, id)
 func _process(delta):
 	if images_to_process > -1:
 		_update_background()
-#		if $VisibilityNotifier2D.is_on_screen():
-#			_update_background()
-#			return
-#		if draw_frame:
-#			_update_background()
-#			draw_frame = false
-#		elif !draw_frame && count != 2:
-#			count += 1
-#		elif !draw_frame && count == 2:
-#			draw_frame = true
-#			count = 0
 
 func setup(image_size:Vector2, sprite_size:Vector2, background_color:Color, scale_: Vector2):
 	BG_SIZE = image_size

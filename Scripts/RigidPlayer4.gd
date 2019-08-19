@@ -7,7 +7,7 @@ export var MAX_VERTICAL_SPEED = 2000
 export var side_speed_growth = 50
 export var jump_strength = 1000
 export var rotate_speed_growth = .1
-export var MAX_ROTATE_SPEED = 10
+export var MAX_ANGULAR_SPEED = 10
 #Kinematic Movement
 export var kin_speed = 200
 
@@ -36,9 +36,16 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 		if Input.is_action_pressed("left") && state.linear_velocity.x > -MAX_HORIZONTAL_SPEED:
 			state.apply_central_impulse((Vector2(side_speed_growth * -1, 0)))
 		#Jump
-		if Input.is_action_just_pressed("up") && state.get_contact_count() > 0 && state.linear_velocity.y > -MAX_VERTICAL_SPEED:
-			emit_signal("jumping")
-			$Timer.start()
+		var required_jump_checks = state.get_contact_count() > 0 && state.linear_velocity.y > -MAX_VERTICAL_SPEED
+		if Input.is_action_pressed("up") && required_jump_checks:
+			if Input.is_action_just_pressed("up"): #For people able to mash
+				emit_signal("jumping")
+				$AnimationDelay.start()
+				$JumpDelay.start(0.3)
+			elif $JumpDelay.get_time_left() == 0: #For people who have a motor disability and would rather hold the button.
+				emit_signal("jumping")
+				$AnimationDelay.start()
+				$JumpDelay.start(0.3)
 			
 		if apply_jump == true:
 			state.apply_central_impulse(Vector2(0,jump_strength * -1))
@@ -65,9 +72,9 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 			if Input.is_action_pressed("down"):
 				velocity.y += kin_speed
 
-		if Input.is_action_pressed("rotate_cw") && rotation_speed < MAX_ROTATE_SPEED:
+		if Input.is_action_pressed("rotate_cw") && rotation_speed < MAX_ANGULAR_SPEED:
 			rotation_speed += rotate_speed_growth
-		if Input.is_action_pressed("rotate_ccw") && rotation_speed > -MAX_ROTATE_SPEED:
+		if Input.is_action_pressed("rotate_ccw") && rotation_speed > -MAX_ANGULAR_SPEED:
 			rotation_speed -= rotate_speed_growth
 		#Slow/Stop spinning
 		if Input.is_action_pressed("rotate_ccw") && Input.is_action_pressed("rotate_cw"): #TODO: For controller, make this R3 and Mouse 3?

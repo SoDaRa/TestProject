@@ -36,10 +36,11 @@ pause_mode = 2
 
 [node name="Player" parent="." instance=ExtResource( 1 )]
 editor/display_folded = true
-curr_shape = 3
+curr_shape = 0
 
 [node name="Level" type="Node" parent="."]
 pause_mode = 2
+editor/display_folded = true
 script = ExtResource( 2 )
 
 [node name="TrailHandler" type="Node" parent="Level"]

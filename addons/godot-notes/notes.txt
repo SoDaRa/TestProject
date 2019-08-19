@@ -1,20 +1,20 @@
 HIT SAVE TO SAVE CHANGES!
 
 To-Do
-- Method to pop players back inbounds should they fall out
 - HUD element showing color selection
-    - Make color wheel radial
+    - Make it a radial color wheel
 - HUD element showing shapes available?
 - Options menu
 - Input mapping in-game
 - Save feature
 - Fix clipping into walls in Fly mode
+- Add choices to dialogue
+- Generate collision shape based on size instead of using scale
 - Standardize code (work out where signal functions go and all that)
-- Make custom color picker for mouse
+- Add prompts on custom color picker (CCP) to explain controls
+- Add button on CCP to swap joy stick controls
 - Implement missions
  (in -x and -y)
-- Make way to add custom png for custom_mode
-- Use VisibilityNotifier2D to optimize when things are shown
 
 Questions to answer:
 - When selecting an already played level, should the player start from scratch, reload the way it was left, or give an option?
@@ -24,6 +24,7 @@ Questions to answer:
 - Consider making the game a metroidvania maybe?
 - Make list of all unlocks and think how to spread them out.
 - Think up level themes.
+- Having movement & paint inputs be toggles so people don't have to hold a button
 
 Notes:
 - Make missions take place on seperate background or seperate layer to not overwrite what player drew on main.
@@ -42,3 +43,6 @@ Dialogue Tree Notes:
 TODO Notes:
 - Supports TODO, HACK, BUG, FIXME, and NOTE
 - Just write that on a line where you want it to take you and when you click on it it'll warp you to it.
+
+Circular Container Notes:
+- Copy custom animator but use node.rect_pivot_offset and node.set_rotation(target_pos.angle_to_point(container_center)) and set Start Empty to true
