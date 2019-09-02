@@ -1,12 +1,12 @@
 extends Node
 
-#Colors for shapes
-export var color_sequence = [Color(1.0, 1.0, 1.0, 1.0), Color(0.0, 1.0, 1.0, 1.0), Color(1.0, 0.0, 1.0, 1.0), Color(1.0, 1.0, 0.0, 1.0)]
+#Colors
+export var color_sequence = [Color(1, 1, 1, 1), Color(0, 1, 1, 1), Color(1, 0, 1, 1), Color(1, 1, 0, 1)] 
 export var curr_color = 0
 
-
-var box_collision = preload("res://Collision/PlayerBoxCollision.tres")
-var ball_collision = preload("res://Collision/PlayerBallCollision.tres")
+#Collision
+#var box_collision = preload("res://Collision/PlayerBoxCollision.tres")
+#var ball_collision = preload("res://Collision/PlayerBallCollision.tres")
 var tri_collision = preload("res://Collision/PlayerTriangleCollision.tres")
 
 var box_sprite = preload("res://Sprites/box.png")
@@ -18,10 +18,16 @@ var custom_sprite = ImageTexture.new()
 
 var collision_outline_shader = preload("res://PlayerCollisionOutlineShader.tres")
 
-enum {BOX_MODE, BALL_MODE, TRI_MODE, WALRUS_MODE, CUSTOM_MODE}   
-export var curr_shape = BALL_MODE
+onready var CCPButtonContainer = get_node("ColorChoices/CenterContainer/ColorButtonsContainer")
 
-var level_rect = Rect2(Vector2(0,0), Vector2(100,100)) 	#Used to define where out of bounds is
+#Shape
+enum SHAPE {BALL, BOX, TRIANGLE, WALRUS, CUSTOM}
+export(SHAPE) onready var starting_shape
+onready var curr_shape = starting_shape
+var shapes_available = 3
+
+#"Stay in-bounds"
+var level_rect = Rect2(Vector2(0,0), Vector2(100,100)) 	#Used to define where out of bounds is. Is set up by parent/RootNode.gd
 var last_valid_position = Vector2(0,0)					#Used to get back in bounds if out of bounds
 var tolerance = 50										#How far the player can travel out of bounds before being snapped inbounds
 
@@ -31,11 +37,11 @@ var MIN_SIZE = 10
 var curr_size = 50
 var curr_max_size = 75 #This will be used to cap how large the player can grow as they unlock more size upgrades.
 
-signal paint(mask, mask_pos, player_color)
+signal painted(paint_image, mask_pos)
 
 onready var MaskSprite = get_node("PlayerMask/Viewport/PMSpriteScale/PMSprite")
 onready var RigidCollision= get_node("PlayerBody/CollisionShape2D")
-onready var MySprite = get_node("SpriteScale/Sprite")
+onready var MySprite = get_node("SpriteScale/PlayerSprite")
 
 #NOTE: Due to player now being a Node instead of a RigidBody, the level should have a Position2D to specify where it should start.
 
@@ -53,6 +59,9 @@ func _ready():
 		custom_sprite = load("res://Sprites/default_custom.png")
 	MySprite.modulate = color_sequence[curr_color]
 	update_shape()
+	
+	for my_color in color_sequence:
+		CCPButtonContainer._add_color(my_color, self)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 # warning-ignore:unused_argument
@@ -75,13 +84,13 @@ func _process(delta):
 #	if Input.is_action_just_pressed("Dummy_Button"):
 #		$PlayerBody.position = Vector2(-1000,-1000)
 		
-	if curr_shape != BALL_MODE: #Get rotation if not a ball
-		MaskSprite.rotation_degrees = MySprite.rotation_degrees
+#	if curr_shape != SHAPE.BALL: #Get rotation if not a ball
+#		MaskSprite.rotation_degrees = MySprite.rotation_degrees
 		
 		#Shape Swap
 	if Input.is_action_just_pressed("swap_shape"):
 		curr_shape += 1
-		curr_shape = wrapi(curr_shape, 0, 5)
+		curr_shape = wrapi(curr_shape, 0, shapes_available)
 		update_shape()
 		
 	#Color Swap
@@ -103,12 +112,12 @@ func _process(delta):
 		new_scale -= Vector2(decreased_by, decreased_by)
 
 		if new_scale.x > 0.1: #Ensure the collision shape doesn't get so small it causes problems
-			RigidCollision.scale = new_scale
+#			RigidCollision.scale = new_scale
 			MySprite.scale = new_scale
 			MaskSprite.scale = new_scale
-
+			RigidCollision.shape = update_collision()
 			curr_size -= 1
-
+		
 		else: #If already too small, just say we're at the min
 			curr_size = MIN_SIZE
 
@@ -116,11 +125,17 @@ func _process(delta):
 		var increased_by = 1.0/BASE_SIZE
 		var new_scale = MySprite.scale
 		new_scale += Vector2(increased_by, increased_by)
-		RigidCollision.scale = new_scale
+#		RigidCollision.scale = new_scale
 		MySprite.scale = new_scale
 		MaskSprite.scale = new_scale
-
+		RigidCollision.shape = update_collision()
 		curr_size += 1
+		
+func _unhandled_input(event):
+	if event.is_action("palette_menu") && !CCPButtonContainer.is_visible() && !get_tree().paused:
+		if Input.is_action_just_pressed("palette_menu"):
+			CCPButtonContainer.show()
+			return
 
 # warning-ignore:unused_argument
 func _physics_process(delta):
@@ -128,11 +143,20 @@ func _physics_process(delta):
 	MySprite.rotation_degrees = $PlayerBody.rotation_degrees
 	
 	if Input.is_action_pressed("paint") && get_tree().paused == false:
-		if curr_shape != BALL_MODE: #Get rotation if not a ball
+		if curr_shape != SHAPE.BALL: #Get rotation if not a ball
 			MaskSprite.rotation_degrees = MySprite.rotation_degrees
-		var my_mask = $PlayerMask/Viewport.get_texture().get_data()
-		var mask_pos = $PlayerBody.position - Vector2(my_mask.get_width() / 2.0,my_mask.get_height() / 2.0)
-		emit_signal("paint", my_mask, mask_pos, color_sequence[curr_color])
+		var my_mask = $PlayerMask/Viewport.get_texture().get_data() #Get the mask to use for blit
+		my_mask = my_mask.get_rect(my_mask.get_used_rect())
+		var player_color = Image.new()								#Get Color for blit
+		player_color.create(my_mask.get_width(), my_mask.get_height(), false, Image.FORMAT_RGBA8)
+		player_color.fill(color_sequence[curr_color])
+		var player_paint = Image.new() 								#Image to send out
+		player_paint.create(my_mask.get_width(), my_mask.get_height(), false, Image.FORMAT_RGBA8)
+		player_paint.blit_rect_mask(player_color, my_mask, my_mask.get_used_rect(), Vector2(0,0))
+		
+		var mask_pos = $PlayerBody.position - Vector2(player_paint.get_width() / 2.0,player_paint.get_height() / 2.0)
+		emit_signal("painted", player_paint, mask_pos)
+		$PlayerTrail.draw_trail(my_mask, mask_pos, color_sequence[curr_color])
 		#NOTE: Don't turn off PlayerMask Visibility
 		#NOTE: Be sure the paint signal is connected to the level!!
 
@@ -141,42 +165,31 @@ func _color_picker_changed(new_color, picker_name):
 	color_sequence[picker_index] = new_color
 	if curr_color == picker_index:
 		MySprite.modulate = color_sequence[curr_color]
-	pass
-
-func color_popup_opened():
-	get_tree().paused = true
-
-func color_popup_closed():
-	get_tree().paused = false
 
 func update_shape():
 	match(curr_shape):
 		#TODO: Generate collision for Collision shape on the fly
-		BALL_MODE:
-			RigidCollision.shape = ball_collision
+		SHAPE.BALL:
 			MySprite.texture = ball_sprite
 			MaskSprite.texture = ball_sprite
 			MySprite.material = null
-		BOX_MODE:
-			RigidCollision.shape = box_collision
+		SHAPE.BOX:
 			MySprite.texture = box_sprite
 			MaskSprite.texture = box_sprite
 			MySprite.material = null
-		TRI_MODE:
-			RigidCollision.shape = tri_collision
+		SHAPE.TRIANGLE:
 			MySprite.texture = tri_sprite
 			MaskSprite.texture = tri_sprite
 			MySprite.material = null
-		WALRUS_MODE:
-			RigidCollision.shape = box_collision
+		SHAPE.WALRUS:
 			MySprite.texture = walrus_sprite
 			MaskSprite.texture = walrus_sprite
 			MySprite.material = collision_outline_shader
-		CUSTOM_MODE:
-			RigidCollision.shape = box_collision
+		SHAPE.CUSTOM:
 			MySprite.texture = custom_sprite
 			MaskSprite.texture = custom_sprite
 			MySprite.material = collision_outline_shader
+	RigidCollision.shape = update_collision()
 
 func _on_RigidBody2D_jumping():
 	if $SpriteScale/AnimationPlayer.is_playing():
@@ -184,3 +197,32 @@ func _on_RigidBody2D_jumping():
 		$PlayerMask/Viewport/PMSpriteScale/MaskAnimation.stop()
 	$SpriteScale/AnimationPlayer.play("JumpAnimation")
 	$PlayerMask/Viewport/PMSpriteScale/MaskAnimation.play("JumpAnimation")
+	
+func set_new_bounds(new_rect: Rect2, new_pos: Vector2):
+	level_rect = new_rect
+	$PlayerBody.position = new_pos
+	$SpriteScale.position = $PlayerBody.position
+	MySprite.rotation_degrees = $PlayerBody.rotation_degrees
+	last_valid_position = new_pos
+	
+func update_collision() -> Shape2D:
+	var new_collision
+	match(curr_shape):
+		SHAPE.BALL: 
+			new_collision = CircleShape2D.new()
+			new_collision.set_radius(float(curr_size) / 2.0)
+		SHAPE.TRIANGLE:
+			new_collision = ConvexPolygonShape2D.new()
+			var new_vector_pool = PoolVector2Array()
+			new_vector_pool.append_array(tri_collision.get_points())
+			var scale = float(curr_size) / float(BASE_SIZE)
+			for idx in range(new_vector_pool.size()): #Update the vector pool to reflect the size
+				var new_vector = new_vector_pool[idx] * scale
+				new_vector_pool.set(idx, new_vector)
+			new_collision.set_points(new_vector_pool)
+		_:		#This is the case for the box, walrus and custom modes.
+			new_collision = RectangleShape2D.new()
+			var new_extends = Vector2(float(curr_size) / 2.0, float(curr_size) / 2.0)
+			new_collision.set_extents(new_extends)
+			
+	return new_collision

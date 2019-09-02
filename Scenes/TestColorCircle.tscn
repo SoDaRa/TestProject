@@ -1,0 +1,129 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Themes_Shaders/CircleFifthButtonTheme.tres" type="Theme" id=1]
+[ext_resource path="res://Scripts/MyCircularContainer.gd" type="Script" id=2]
+[ext_resource path="res://addons/KOBUGE-games.CircularContainer/icon.png" type="Texture" id=3]
+[ext_resource path="res://Themes_Shaders/CircularButtonTestTheme.tres" type="Theme" id=4]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="CircularContainer" type="Container" parent="."]
+margin_right = 36.3238
+margin_bottom = 44.3238
+theme = ExtResource( 1 )
+script = ExtResource( 2 )
+__meta__ = {
+"_editor_icon": ExtResource( 3 )
+}
+arrange/force_squares = false
+arrange/force_expand = true
+arrange/start_angle = 0.0
+arrange/start_empty = false
+arrange/allow_node2d = false
+animate/percent_visible = 1.0
+animate/all_at_once = false
+
+[node name="Button" type="Button" parent="CircularContainer"]
+self_modulate = Color( 1, 0, 0, 1 )
+margin_left = 77.2504
+margin_top = 46.3503
+margin_right = 141.25
+margin_bottom = 110.35
+rect_min_size = Vector2( 64, 64 )
+rect_rotation = -2.50448e-006
+rect_pivot_offset = Vector2( 32, 32 )
+
+[node name="Button2" type="Button" parent="CircularContainer"]
+self_modulate = Color( 0, 1, 0.0509804, 1 )
+margin_left = 47.8626
+margin_top = 67.7018
+margin_right = 111.863
+margin_bottom = 131.702
+rect_min_size = Vector2( 64, 64 )
+rect_rotation = -72.0
+rect_pivot_offset = Vector2( 32, 32 )
+
+[node name="Button3" type="Button" parent="CircularContainer"]
+self_modulate = Color( 0, 0.0980392, 1, 1 )
+show_behind_parent = true
+margin_left = 59.0878
+margin_top = 102.249
+margin_right = 123.088
+margin_bottom = 166.249
+rect_min_size = Vector2( 64, 64 )
+rect_rotation = 216.0
+rect_pivot_offset = Vector2( 32, 32 )
+
+[node name="Button4" type="Button" parent="CircularContainer"]
+show_behind_parent = true
+margin_left = 95.4131
+margin_top = 102.249
+margin_right = 159.413
+margin_bottom = 166.249
+rect_min_size = Vector2( 64, 64 )
+rect_rotation = 144.0
+rect_pivot_offset = Vector2( 32, 32 )
+
+[node name="Button5" type="Button" parent="CircularContainer"]
+self_modulate = Color( 0.87451, 0, 1, 1 )
+show_behind_parent = true
+margin_left = 106.638
+margin_top = 67.7017
+margin_right = 170.638
+margin_bottom = 131.702
+rect_min_size = Vector2( 64, 64 )
+rect_rotation = 72.0
+rect_pivot_offset = Vector2( 32, 32 )
+
+[node name="Button6" type="Button" parent="CircularContainer"]
+visible = false
+self_modulate = Color( 0.945098, 1, 0, 1 )
+show_behind_parent = true
+margin_left = 103.544
+margin_top = 177.504
+margin_right = 153.544
+margin_bottom = 227.504
+rect_min_size = Vector2( 50, 50 )
+rect_rotation = 225.0
+rect_pivot_offset = Vector2( 25, 25 )
+theme = ExtResource( 4 )
+
+[node name="Button7" type="Button" parent="CircularContainer"]
+visible = false
+self_modulate = Color( 0, 1, 1, 1 )
+show_behind_parent = true
+margin_left = 161.368
+margin_top = 57.4308
+margin_right = 211.368
+margin_bottom = 107.431
+rect_min_size = Vector2( 50, 50 )
+rect_rotation = 96.4286
+rect_pivot_offset = Vector2( 25, 25 )
+
+[node name="Button8" type="Button" parent="CircularContainer"]
+visible = false
+self_modulate = Color( 1, 0.560784, 0, 1 )
+show_behind_parent = true
+margin_left = 155.842
+margin_top = 51.2464
+margin_right = 205.842
+margin_bottom = 101.246
+rect_min_size = Vector2( 50, 50 )
+rect_rotation = 90.0
+rect_pivot_offset = Vector2( 25, 25 )
+
+[node name="Button9" type="Button" parent="CircularContainer"]
+visible = false
+self_modulate = Color( 0.568627, 0, 1, 1 )
+show_behind_parent = true
+margin_left = 151.085
+margin_top = 46.8874
+margin_right = 201.085
+margin_bottom = 96.8874
+rect_min_size = Vector2( 50, 50 )
+rect_rotation = 85.0
+rect_pivot_offset = Vector2( 25, 25 )
+
+[node name="Tween" type="Tween" parent="CircularContainer"]

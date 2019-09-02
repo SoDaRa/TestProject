@@ -2,7 +2,7 @@ extends Node
 
 signal Dialogue_Next (ref, actor, text)
 signal Choice_Next (ref, choices)
-signal Conditonal_Data_Needed
+signal Conditonal_Data_Needed (ref)
 signal Dialogue_Started
 signal Dialogue_Ended
 
@@ -86,20 +86,20 @@ func _process_next(nextDialogue, nextIndex):
 	if nextDialogue.has("Choices"):
 		if nextDialogue["Conditonal"]:
 			queued_for_conditonal = true
-			emit_signal("Conditonal_Data_Needed")
+			emit_signal("Conditonal_Data_Needed", nextDialogue.Ref)
 		else:
 			emit_signal("Choice_Next", nextDialogue.Ref, nextDialogue.Choices)
 	elif nextDialogue.has("RandomChoices"):
 		if nextDialogue["Conditonal"]:
 			queued_for_conditonal = true
-			emit_signal("Conditonal_Data_Needed")
+			emit_signal("Conditonal_Data_Needed", nextDialogue.Ref)
 		else:
 			if RandomizeBeforeRandom:
 				randomize()
 			next_dialogue(round(rand_range(0, nextDialogue["RandomChoices"].size() - 1)))
 	elif nextDialogue.has("failnext"):
 		queued_for_conditonal = true
-		emit_signal("Conditonal_Data_Needed")
+		emit_signal("Conditonal_Data_Needed", nextDialogue.Ref)
 	else:
 		emit_signal("Dialogue_Next", nextDialogue.Ref, nextDialogue.Actor, nextDialogue.Dialogue)
 

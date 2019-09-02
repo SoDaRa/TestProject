@@ -5,10 +5,16 @@ var preset_colors = []
 onready var PresetBar: HBoxContainer = get_node("VBox/PresetBar")
 onready var MainDisplay: HBoxContainer = get_node("VBox/Main")
 var preset_color_button_array = []
-var PRESET_MAX = 10
+const PRESET_MAX = 10
 
 signal color_changed(new_color)
 signal lose_focus
+
+func _ready():
+	for index in range(PRESET_MAX):
+		preset_color_button_array.append(PresetBar.get_node(str(index))) #All but AddButton
+	if MainDisplay.color != color:
+		MainDisplay.color = color
 
 #Public Functions
 func set_pick_color(new_color, internal = false): #Internal is just to check if it's a call from inside the scene
@@ -48,12 +54,6 @@ func erase_all_presets():
 	preset_colors.clear()
 
 #Private Functions
-func _ready():
-	for index in range(PRESET_MAX):
-		preset_color_button_array.append(PresetBar.get_node(str(index))) #All but AddButton
-	if MainDisplay.color != color:
-		MainDisplay.color = color
-
 func _on_Main_main_color_changed(new_color): #When display updated, update color and emit signal
 	self.set_pick_color(new_color, true)
 

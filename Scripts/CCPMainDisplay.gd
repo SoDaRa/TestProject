@@ -31,7 +31,6 @@ func _ready():
 # warning-ignore:unused_argument
 func _process(delta): #Joypad axis are handled here instead of gui_input to make more fluid
 	if self.has_focus():
-		self.modulate = Color(1.0,1.0,1.0,1.0)
 		var update_needed = false
 		#Joypad Input Handler
 		if Input.get_connected_joypads().size() > 0:
@@ -72,69 +71,66 @@ func _process(delta): #Joypad axis are handled here instead of gui_input to make
 				update_needed = true
 		
 		#Keyboard Input
-		#Hue
 		var hue_cw = Input.is_action_pressed("ccp_hue_cw")
 		var hue_ccw = Input.is_action_pressed("ccp_hue_ccw")
-		if hue_cw || hue_ccw:
-			var new_hue = hue * 360
-			if hue_cw:
-				new_hue = new_hue + 1
-			if hue_ccw:
-				new_hue = new_hue - 1
-			#Wrap to other side of circle (for convenience)
-			if Input.is_action_just_pressed("ccp_hue_cw") && Input.is_action_just_pressed("ccp_hue_ccw"):
-				new_hue = new_hue + 180
-			if (hue_cw && Input.is_action_just_pressed("ccp_hue_ccw")) || (hue_ccw && Input.is_action_just_pressed("ccp_hue_cw")):
-				new_hue = new_hue + 180
-			
-			hue = wrapf(new_hue, 0, 360) / 360
-			update_needed = true
-		
-		#Saturation
 		var sat_up = Input.is_action_pressed("ccp_saturation_up")
 		var sat_down = Input.is_action_pressed("ccp_saturation_down")
-		if sat_up || sat_down:
-			if sat_up && saturation < 1.0:
-				saturation = saturation + 1.0/255.0
-				if saturation > 1.0:
-					saturation = 1.0
-			if sat_down && saturation > 0:
-				saturation -= 1.0/255.0
-				if saturation < 0:
-					saturation = 0.0
-			#Wrap around handlers
-			if Input.is_action_just_pressed("ccp_saturation_up") && saturation == 1.0:
-				saturation = 0.0
-			if Input.is_action_just_pressed("ccp_saturation_down") && saturation == 0.0:
-				saturation = 1.0
-			update_needed = true
-			
-		#Value
 		var val_up = Input.is_action_pressed("ccp_value_up")
 		var val_down = Input.is_action_pressed("ccp_value_down")
-		if val_up || val_down:
-			if val_up && value < 1.0:
-				value = value + 1.0/255.0
-				if value > 1.0:
-					value = 1.0
-			if val_down && value > 0:
-				value -= 1.0/255.0
-				if value < 0:
+		if hue_cw || hue_ccw || sat_up || sat_down || val_up || val_down: #This is just to make the code collapsable
+			#Hue
+			if hue_cw || hue_ccw:
+				var new_hue = hue * 360
+				if hue_cw:
+					new_hue = new_hue + 1
+				if hue_ccw:
+					new_hue = new_hue - 1
+				#Wrap to other side of circle (for convenience)
+				if Input.is_action_just_pressed("ccp_hue_cw") && Input.is_action_just_pressed("ccp_hue_ccw"):
+					new_hue = new_hue + 180
+				if (hue_cw && Input.is_action_just_pressed("ccp_hue_ccw")) || (hue_ccw && Input.is_action_just_pressed("ccp_hue_cw")):
+					new_hue = new_hue + 180
+				
+				hue = wrapf(new_hue, 0, 360) / 360
+				update_needed = true
+			
+			#Saturation
+			if sat_up || sat_down:
+				if sat_up && saturation < 1.0:
+					saturation = saturation + 1.0/255.0
+					if saturation > 1.0:
+						saturation = 1.0
+				if sat_down && saturation > 0:
+					saturation -= 1.0/255.0
+					if saturation < 0:
+						saturation = 0.0
+				#Wrap around handlers
+				if Input.is_action_just_pressed("ccp_saturation_up") && saturation == 1.0:
+					saturation = 0.0
+				if Input.is_action_just_pressed("ccp_saturation_down") && saturation == 0.0:
+					saturation = 1.0
+				update_needed = true
+				
+			#Value
+			if val_up || val_down:
+				if val_up && value < 1.0:
+					value = value + 1.0/255.0
+					if value > 1.0:
+						value = 1.0
+				if val_down && value > 0:
+					value -= 1.0/255.0
+					if value < 0:
+						value = 0.0
+				#Wrap around handlers
+				if Input.is_action_just_pressed("ccp_value_up") && value == 1.0:
 					value = 0.0
-			#Wrap around handlers
-			if Input.is_action_just_pressed("ccp_value_up") && value == 1.0:
-				value = 0.0
-			if Input.is_action_just_pressed("ccp_value_down") && value == 0.0:
-				value = 1.0
-			update_needed = true
+				if Input.is_action_just_pressed("ccp_value_down") && value == 0.0:
+					value = 1.0
+				update_needed = true
 		
 		#Set new color
 		if update_needed == true:
 			_update_color()
-
-	else: #If this doesn't have the focus
-		self.modulate = Color(1.0,1.0,1.0,0.5)
-	Sample.material.set_shader_param("picker_color", Color.from_hsv(hue, 1.0, 1.0))
 
 
 func _gui_input(event):
@@ -161,9 +157,17 @@ func _gui_input(event):
 			elif event.get_axis_value() > 0.65 && value == 0.0:
 				value = 1.0
 				update_needed = true
-
+		
 		if update_needed == true:
 			_update_color()
+
+func _notification(what):
+	match(what):
+		NOTIFICATION_FOCUS_ENTER:
+			self.modulate = Color(1.0,1.0,1.0,1.0)
+		NOTIFICATION_FOCUS_EXIT:
+			self.modulate = Color(1.0,1.0,1.0,0.5)
+
 
 func _update_color():
 	color = Color.from_hsv(hue,saturation,value)

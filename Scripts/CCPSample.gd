@@ -1,7 +1,7 @@
 extends ColorRect
 
 var my_material = ShaderMaterial.new()
-var my_shader = preload("res://Scripts/ColorPickerSample.shader")
+var my_shader = preload("res://Themes_Shaders/ColorPickerSample.shader")
 
 signal mouse_input(pos)
 

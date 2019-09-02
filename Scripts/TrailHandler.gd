@@ -36,17 +36,17 @@ func _ready():
 		buffer_2[x].centered = false
 
 func hide_trail():
-	for x in range(TRAIL_LENGTH):
-		if x < BUFFER_LENGTH:
-			if buffer_1_in_use == true:	#If buffer 1 was being used, hide it and put buffer 2 beneath main trail
-				buffer_1[x].position = Vector2(-1000,-1000)
-				buffer_1[x].z_index = -x
-				buffer_2[x].z_index = -TRAIL_LENGTH - BUFFER_LENGTH - x 
-			else:
-				buffer_2[x].position = Vector2(-1000,-1000)
-				buffer_2[x].z_index = -x
-				buffer_1[x].z_index = -TRAIL_LENGTH - BUFFER_LENGTH - x
-		trail_array[x].position = Vector2(-1000,-1000)
+	for idx in range(TRAIL_LENGTH):
+		trail_array[idx].modulate = Color(0,0,0,0)
+	for idx in range (BUFFER_LENGTH):
+		if buffer_1_in_use == true:	#If buffer 1 was being used, hide it and put buffer 2 beneath main trail
+			buffer_1[idx].modulate = Color(0,0,0,0)
+			buffer_1[idx].z_index = -idx
+			buffer_2[idx].z_index = -TRAIL_LENGTH - BUFFER_LENGTH - idx 
+		else:
+			buffer_2[idx].modulate = Color(0,0,0,0)
+			buffer_2[idx].z_index = -idx
+			buffer_1[idx].z_index = -TRAIL_LENGTH - BUFFER_LENGTH - idx
 	trail_idx = TRAIL_LENGTH - 1
 	buffer_idx = BUFFER_LENGTH - 1
 	if buffer_1_in_use == false:
@@ -80,6 +80,7 @@ func _draw_buffer(mask_info: Dictionary):
 		_update_sprite(buffer_2[buffer_idx], mask_info)
 	buffer_idx -= 1
 	
+	assert(buffer_idx > -1)
 	if buffer_idx <= -1:
 		print("Buffer_idx is negative!!")
 		hide_trail()
@@ -93,13 +94,15 @@ func _update_sprite(to_update: Sprite, mask_info: Dictionary):
 	player_color.fill(mask_info["color"])
 	player_image.fill(Color(mask_info["color"].r,mask_info["color"].g,mask_info["color"].b,0.0))
 	
-	player_image.blit_rect_mask(player_color, mask_info["image"], Rect2(0,0,mask_info["image"].get_width(), mask_info["image"].get_height()), Vector2(0,0))
+	player_image.blit_rect_mask(player_color, mask_info["image"], Rect2(0,0,mask_info["image"].get_width(), mask_info["image"].get_height()), \
+								Vector2(0,0))
 	
 	var sprite_texture = ImageTexture.new()
 	sprite_texture.create_from_image(player_image, 5)
 	
 	to_update.position = mask_info["pos"]
 	to_update.texture = sprite_texture
+	to_update.modulate = Color(1.0, 1.0, 1.0, 1.0)
 	
 func swap_to_buffer():
 	use_main = false

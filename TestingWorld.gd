@@ -39,4 +39,4 @@ func _on_NextTimer_timeout():
 	$Dialogue2.next_dialogue()
 
 func _on_Dialogue2_Conditonal_Data_Needed():
-	$Dialogue2.send_conditonal_data({"test" : "hello"})
+	$Dialogue2.send_conditonal_data({"test" : "hello2"})

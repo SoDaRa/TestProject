@@ -9,17 +9,87 @@ __meta__ = {
 "_editor_icon": ExtResource( 1 )
 }
 connections = [ {
-"from": "StartNode",
-"from_port": 0,
-"to": "BasicDialogue",
-"to_port": 0
-}, {
 "from": "BasicDialogue",
 "from_port": 0,
 "to": "BasicDialogue2",
 "to_port": 0
 }, {
 "from": "BasicDialogue2",
+"from_port": 0,
+"to": "ChoiceDialogue",
+"to_port": 0
+}, {
+"from": "ChoiceDialogue",
+"from_port": 0,
+"to": "BasicDialogue3",
+"to_port": 0
+}, {
+"from": "ChoiceDialogue",
+"from_port": 1,
+"to": "BasicDialogue4",
+"to_port": 0
+}, {
+"from": "StartNode",
+"from_port": 0,
+"to": "ConditonalDialogue",
+"to_port": 0
+}, {
+"from": "ConditonalDialogue",
+"from_port": 0,
+"to": "BasicDialogue",
+"to_port": 0
+}, {
+"from": "ConditonalDialogue2",
+"from_port": 0,
+"to": "BasicDialogue5",
+"to_port": 0
+}, {
+"from": "ConditonalDialogue2",
+"from_port": 1,
+"to": "BasicDialogue6",
+"to_port": 0
+}, {
+"from": "ConditonalDialogue",
+"from_port": 1,
+"to": "ConditonalDialogue2",
+"to_port": 0
+}, {
+"from": "BasicDialogue3",
+"from_port": 0,
+"to": "EndNode",
+"to_port": 0
+}, {
+"from": "BasicDialogue4",
+"from_port": 0,
+"to": "EndNode",
+"to_port": 0
+}, {
+"from": "BasicDialogue5",
+"from_port": 0,
+"to": "EndNode",
+"to_port": 0
+}, {
+"from": "BasicDialogue6",
+"from_port": 0,
+"to": "BasicDialogue7",
+"to_port": 0
+}, {
+"from": "BasicDialogue7",
+"from_port": 0,
+"to": "ChoiceDialogue2",
+"to_port": 0
+}, {
+"from": "ChoiceDialogue2",
+"from_port": 0,
+"to": "BasicDialogue3",
+"to_port": 0
+}, {
+"from": "ChoiceDialogue2",
+"from_port": 1,
+"to": "BasicDialogue8",
+"to_port": 0
+}, {
+"from": "BasicDialogue8",
 "from_port": 0,
 "to": "EndNode",
 "to_port": 0
@@ -29,15 +99,15 @@ Nodes = [ {
 "name": "EndNode",
 "rect_size_x": 80.0,
 "rect_size_y": 55.0,
-"rect_x": 0.0,
-"rect_y": 0.0
+"rect_x": 1781.38,
+"rect_y": -98.2021
 }, {
 "filename": "res://addons/dialogue_tree/scenes/StartNode.tscn",
 "name": "StartNode",
 "rect_size_x": 87.0,
 "rect_size_y": 55.0,
-"rect_x": 0.0,
-"rect_y": 0.0
+"rect_x": 195.728,
+"rect_y": -97.1901
 }, {
 "Actor": "My Man",
 "Dialogue": "What's happening man?",
@@ -46,18 +116,130 @@ Nodes = [ {
 "name": "BasicDialogue",
 "rect_size_x": 170.0,
 "rect_size_y": 114.0,
-"rect_x": 0.0,
-"rect_y": 0.0
+"rect_x": 555.729,
+"rect_y": -97.1901
+}, {
+"Conditonal": false,
+"RefName": "Initial mission",
+"choices": [ {
+"Conditional": "",
+"Dialogue": "Sure!",
+"ToolTip": ""
+}, {
+"Conditional": "",
+"Dialogue": "Can't right now...",
+"ToolTip": ""
+} ],
+"filename": "res://addons/dialogue_tree/scenes/ChoiceDialogue.tscn",
+"name": "ChoiceDialogue",
+"rect_size_x": 210.0,
+"rect_size_y": 141.0,
+"rect_x": 995.728,
+"rect_y": -97.1901
 }, {
 "Actor": "My Man",
-"Dialogue": "You look cool :D",
+"Dialogue": "Awesome! Let me just get setup.",
+"RefName": "Accept",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue3",
+"rect_size_x": 170.001,
+"rect_size_y": 114.0,
+"rect_x": 1275.73,
+"rect_y": -97.1901
+}, {
+"Actor": "My Man",
+"Dialogue": "Can you help me with something?",
 "RefName": "TestDialogue2",
 "filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
 "name": "BasicDialogue2",
+"rect_size_x": 212.0,
+"rect_size_y": 124.0,
+"rect_x": 755.728,
+"rect_y": -97.1901
+}, {
+"conditonal": "\"{mission_status}\" == \"not completed\"",
+"filename": "res://addons/dialogue_tree/scenes/ConditonalDialogue.tscn",
+"name": "ConditonalDialogue",
+"rect_size_x": 205.0,
+"rect_size_y": 114.0,
+"rect_x": 323.865,
+"rect_y": -97.4181
+}, {
+"Actor": "My Man",
+"Dialogue": "Thanks for the help! :D",
+"RefName": "Mission done",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue5",
 "rect_size_x": 170.0,
 "rect_size_y": 114.0,
-"rect_x": 0.0,
-"rect_y": 0.0
+"rect_x": 983.864,
+"rect_y": 62.5818
+}, {
+"Actor": "My Man",
+"Dialogue": "Thanks for the help earlier! I love these new glasses!",
+"RefName": "Thanks",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue6",
+"rect_size_x": 170.0,
+"rect_size_y": 114.0,
+"rect_x": 983.864,
+"rect_y": 182.582
+}, {
+"conditonal": "\"{mission_status}\" == \"just completed\"",
+"filename": "res://addons/dialogue_tree/scenes/ConditonalDialogue.tscn",
+"name": "ConditonalDialogue2",
+"rect_size_x": 232.0,
+"rect_size_y": 114.0,
+"rect_x": 603.865,
+"rect_y": 62.5818
+}, {
+"Actor": "My Man",
+"Dialogue": "Would you like to make another pair for me?",
+"RefName": "Repeat?",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue7",
+"rect_size_x": 170.0,
+"rect_size_y": 114.0,
+"rect_x": 1201.38,
+"rect_y": 181.798
+}, {
+"Conditonal": false,
+"RefName": "Mission repeat",
+"choices": [ {
+"Conditional": "",
+"Dialogue": "Sure!",
+"ToolTip": ""
+}, {
+"Conditional": "",
+"Dialogue": "Nahhh",
+"ToolTip": ""
+} ],
+"filename": "res://addons/dialogue_tree/scenes/ChoiceDialogue.tscn",
+"name": "ChoiceDialogue2",
+"rect_size_x": 210.0,
+"rect_size_y": 141.0,
+"rect_x": 1421.38,
+"rect_y": 181.798
+}, {
+"Actor": "My Man",
+"Dialogue": "Aww... Sorry to hear that. Come back when you're ready!",
+"RefName": "Decline",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue4",
+"rect_size_x": 174.0,
+"rect_size_y": 119.0,
+"rect_x": 1281.38,
+"rect_y": 21.7978
+}, {
+"Actor": "My Man",
+"Dialogue": "Alright talk to ya later!",
+"RefName": "Bye",
+"filename": "res://addons/dialogue_tree/scenes/BasicDialogue.tscn",
+"name": "BasicDialogue8",
+"rect_size_x": 170.0,
+"rect_size_y": 114.0,
+"rect_x": 1681.38,
+"rect_y": 121.798
 } ]
 DialogueTree = {
 "dialogue": [ {
@@ -65,13 +247,95 @@ DialogueTree = {
 "Dialogue": "What's happening man?",
 "NodeName": "BasicDialogue",
 "Ref": "TestDialogue",
-"next": 1
+"next": 3
+}, {
+"Choices": [ {
+"Conditional": "",
+"Dialogue": "Sure!",
+"PassCondition": true,
+"ToolTip": "",
+"next": 2
+}, {
+"Conditional": "",
+"Dialogue": "Can't right now...",
+"PassCondition": true,
+"ToolTip": "",
+"next": 10
+} ],
+"Conditonal": false,
+"NodeName": "ChoiceDialogue",
+"Ref": "Initial mission"
 }, {
 "Actor": "My Man",
-"Dialogue": "You look cool :D",
+"Dialogue": "Awesome! Let me just get setup.",
+"NodeName": "BasicDialogue3",
+"Ref": "Accept",
+"next": "End"
+}, {
+"Actor": "My Man",
+"Dialogue": "Can you help me with something?",
 "NodeName": "BasicDialogue2",
 "Ref": "TestDialogue2",
+"next": 1
+}, {
+"Condition": "\"{mission_status}\" == \"not completed\"",
+"NodeName": "ConditonalDialogue",
+"Ref": "Mission Done?",
+"failnext": 7,
+"next": 0
+}, {
+"Actor": "My Man",
+"Dialogue": "Thanks for the help! :D",
+"NodeName": "BasicDialogue5",
+"Ref": "Mission done",
+"next": "End"
+}, {
+"Actor": "My Man",
+"Dialogue": "Thanks for the help earlier! I love these new glasses!",
+"NodeName": "BasicDialogue6",
+"Ref": "Thanks",
+"next": 8
+}, {
+"Condition": "\"{mission_status}\" == \"just completed\"",
+"NodeName": "ConditonalDialogue2",
+"Ref": "Mission Just Done?",
+"failnext": 6,
+"next": 5
+}, {
+"Actor": "My Man",
+"Dialogue": "Would you like to make another pair for me?",
+"NodeName": "BasicDialogue7",
+"Ref": "Repeat?",
+"next": 9
+}, {
+"Choices": [ {
+"Conditional": "",
+"Dialogue": "Sure!",
+"PassCondition": true,
+"ToolTip": "",
+"next": 2
+}, {
+"Conditional": "",
+"Dialogue": "Nahhh",
+"PassCondition": true,
+"ToolTip": "",
+"next": 11
+} ],
+"Conditonal": false,
+"NodeName": "ChoiceDialogue2",
+"Ref": "Mission repeat"
+}, {
+"Actor": "My Man",
+"Dialogue": "Aww... Sorry to hear that. Come back when you're ready!",
+"NodeName": "BasicDialogue4",
+"Ref": "Decline",
+"next": "End"
+}, {
+"Actor": "My Man",
+"Dialogue": "Alright talk to ya later!",
+"NodeName": "BasicDialogue8",
+"Ref": "Bye",
 "next": "End"
 } ],
-"start_index": 0
+"start_index": 4
 }

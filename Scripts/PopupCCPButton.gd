@@ -5,7 +5,7 @@ var custom_picker
 
 var custom_popup = PopupPanel.new()
 
-export var color = Color(1.0,0.0,0.0,1.0)
+export var color = Color(1,0,0,1)
 var presets: PoolColorArray setget , get_presets
 
 var popup_opened = false setget , is_popup_open
@@ -25,7 +25,6 @@ func _ready():
 	self.add_child(custom_popup)
 	custom_picker.connect("lose_focus", self, "_close_custom_popup")
 	custom_popup.connect("popup_hide", self, "_close_custom_popup")
-
 
 func _pressed():
 	custom_picker.color = color

@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Themes_Shaders/PlayerColorWheel.shader" type="Shader" id=1]
+[ext_resource path="res://Sprites/big_blank_ball.png" type="Texture" id=2]
+[ext_resource path="res://Scripts/TestTextureButtonShader.gd" type="Script" id=3]
+
+[sub_resource type="ShaderMaterial" id=1]
+shader = ExtResource( 1 )
+shader_param/color0 = null
+shader_param/color1 = null
+shader_param/color2 = null
+shader_param/color3 = null
+shader_param/color4 = null
+shader_param/color5 = null
+shader_param/color6 = null
+shader_param/color7 = null
+shader_param/color8 = null
+shader_param/colors_in_use = null
+shader_param/center = Vector2( 0.5, 0.5 )
+shader_param/min_gradient = 0.025
+shader_param/max_gradient = 0.975
+
+[node name="TextureButton" type="TextureButton"]
+material = SubResource( 1 )
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -100.0
+margin_top = -100.0
+margin_right = 100.0
+margin_bottom = 100.0
+rect_pivot_offset = Vector2( 100, 100 )
+texture_normal = ExtResource( 2 )
+script = ExtResource( 3 )
+
+[node name="Tween" type="Tween" parent="."]

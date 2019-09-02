@@ -67,8 +67,8 @@ __meta__ = {
 "_editor_icon": ExtResource( 2 )
 }
 arrange/force_squares = true
-arrange/force_expand = true
-arrange/start_angle = 360.0
+arrange/force_expand = false
+arrange/start_angle = 0.0
 arrange/start_empty = false
 arrange/allow_node2d = false
 animate/percent_visible = 0.0
@@ -79,7 +79,9 @@ margin_left = 38.4283
 margin_top = 38.4282
 margin_right = 58.4283
 margin_bottom = 58.4282
+rect_rotation = 45.0
 rect_scale = Vector2( 0.01, 0.01 )
+rect_pivot_offset = Vector2( 10, 10 )
 text = "1"
 
 [node name="Button1" type="Button" parent="VBoxContainer/HBoxContainer/CircularContainer"]
@@ -87,7 +89,9 @@ margin_left = 38.4283
 margin_top = 38.4282
 margin_right = 58.4283
 margin_bottom = 58.4282
+rect_rotation = -14.6652
 rect_scale = Vector2( 0.01, 0.01 )
+rect_pivot_offset = Vector2( 10, 10 )
 text = "2"
 
 [node name="Button2" type="Button" parent="VBoxContainer/HBoxContainer/CircularContainer"]
@@ -95,6 +99,7 @@ margin_left = 38.4283
 margin_top = 38.4282
 margin_right = 58.4283
 margin_bottom = 58.4282
+rect_rotation = 285.67
 rect_scale = Vector2( 0.01, 0.01 )
 rect_pivot_offset = Vector2( 10, 10 )
 text = "3"
@@ -104,6 +109,7 @@ margin_left = 38.4283
 margin_top = 38.4282
 margin_right = 58.4283
 margin_bottom = 58.4282
+rect_rotation = 226.004
 rect_scale = Vector2( 0.01, 0.01 )
 rect_pivot_offset = Vector2( 10, 10 )
 text = "4"
@@ -113,7 +119,9 @@ margin_left = 38.4283
 margin_top = 38.4282
 margin_right = 58.4283
 margin_bottom = 58.4282
+rect_rotation = 166.339
 rect_scale = Vector2( 0.01, 0.01 )
+rect_pivot_offset = Vector2( 10, 10 )
 text = "5"
 
 [node name="Button5" type="Button" parent="VBoxContainer/HBoxContainer/CircularContainer"]
@@ -121,7 +129,9 @@ margin_left = 38.4283
 margin_top = 38.4282
 margin_right = 58.4283
 margin_bottom = 58.4282
+rect_rotation = 106.674
 rect_scale = Vector2( 0.01, 0.01 )
+rect_pivot_offset = Vector2( 10, 10 )
 text = "6"
 
 [node name="Button6" type="Button" parent="VBoxContainer/HBoxContainer/CircularContainer"]
@@ -129,7 +139,9 @@ margin_left = 38.4283
 margin_top = 38.4282
 margin_right = 58.4283
 margin_bottom = 58.4282
+rect_rotation = 47.0087
 rect_scale = Vector2( 0.01, 0.01 )
+rect_pivot_offset = Vector2( 10, 10 )
 text = "7"
 
 [node name="Right" type="Panel" parent="VBoxContainer/HBoxContainer"]

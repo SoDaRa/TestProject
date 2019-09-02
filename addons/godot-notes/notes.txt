@@ -8,13 +8,10 @@ To-Do
 - Input mapping in-game
 - Save feature
 - Fix clipping into walls in Fly mode
-- Add choices to dialogue
-- Generate collision shape based on size instead of using scale
 - Standardize code (work out where signal functions go and all that)
 - Add prompts on custom color picker (CCP) to explain controls
 - Add button on CCP to swap joy stick controls
-- Implement missions
- (in -x and -y)
+- Make input method for keyboard+mouse where mouse drag determines direction in fly mode
 
 Questions to answer:
 - When selecting an already played level, should the player start from scratch, reload the way it was left, or give an option?

@@ -16,11 +16,54 @@ var _cached_min_size_key = "" setget _private_set, _private_get
 var _cached_min_size = null setget _private_set, _private_get
 var _cached_min_size_dirty = false setget _private_set, _private_get
 
+var circle_fifth_theme = preload("res://Themes_Shaders/CircleFifthButtonTheme.tres")
+var circle_quarter_theme = preload("res://Themes_Shaders/CircleQuarterButtonTheme.tres")
+
 ## Callbacks ##
 
 func _ready():
 	connect("sort_children", self, "_resort")
 	_resort()
+	
+func _input(event:InputEvent):
+	if event.is_action("ui_left") && Input.is_action_just_pressed("ui_left") && !$Tween.is_active():
+		var angle = self.get_start_angle_deg()
+		var count = 0
+		for child in self.get_children():
+			if child is CanvasItem:
+				if child.is_visible():
+					count += 1
+		match(count):
+			1:
+				return
+			4:
+				self.theme = circle_quarter_theme
+			5:
+				self.theme = circle_fifth_theme
+		angle += 360 / count
+		$Tween.interpolate_method(self, "set_start_angle_deg", self.get_start_angle_deg(), angle, 0.05, Tween.TRANS_LINEAR, Tween.EASE_IN)
+		$Tween.start()
+#		self.set_start_angle_deg(angle)
+	if event.is_action("ui_right") && Input.is_action_just_pressed("ui_right") && !$Tween.is_active():
+		var angle = self.get_start_angle_deg()
+		var count = 0
+		for child in self.get_children():
+			if child is CanvasItem:
+				if child.is_visible():
+					count += 1
+		match(count):
+			1:
+				return
+			4:
+				self.theme = circle_quarter_theme
+			5:
+				self.theme = circle_fifth_theme
+		if count == 1:
+			return
+		angle -= 360 / count
+		$Tween.interpolate_method(self, "set_start_angle_deg", self.get_start_angle_deg(), angle, 0.05, Tween.TRANS_LINEAR, Tween.EASE_IN)
+		$Tween.start()
+#		self.set_start_angle_deg(angle)
 
 ## Properties / Public API ##
 
@@ -36,7 +79,7 @@ func set_force_squares(enable):
 func is_force_squares_enabled():
 	return _force_squares
 
-func set_force_expand(enable): 
+func set_force_expand(enable):
 	_force_expand = bool(enable)
 	_resort()
 
@@ -46,7 +89,7 @@ func is_force_expand_enabled():
 func set_start_angle(rad):
 	_start_angle = float(rad)
 	_resort()
-	
+
 func get_start_angle():
 	return _start_angle
 
@@ -74,7 +117,7 @@ func is_display_all_at_once():
 func set_allow_node2d(enable):
 	_allow_node2d = bool(enable)
 	_resort()
-	
+
 func is_allowing_node2d():
 	return _allow_node2d
 
@@ -113,7 +156,7 @@ func _set(property, value):
 	elif property == "animate/all_at_once": set_display_all_at_once(value)
 	else:
 		return false
-	
+
 	return true # When return false doesn't happen
 
 func _get(property):
@@ -130,23 +173,24 @@ func _get(property):
 func _resort():
 	var rect = get_rect()
 	var origin = rect.size / 2
-	
+
 	var children = _get_filtered_children()
-	
+
 	if children.size() == 0:
 		return
-		
+
 	var min_child_size = Vector2()
 	for child in children:
 		var size = _get_child_min_size(child)
 		min_child_size.x = max(min_child_size.x, size.x)
 		min_child_size.y = max(min_child_size.y, size.y)
+#NOTE: Radius calculation here. Default is " / 2"
+	var radius = min(rect.size.x - min_child_size.x, rect.size.y - min_child_size.y) / children.size() #2.8 works at 4
 	
-	var radius = min(rect.size.x - min_child_size.x, rect.size.y - min_child_size.y) / 2.8
 	if !_cached_min_size_dirty:
 		call_deferred("_update_cached_min_size")
 		_cached_min_size_dirty = true # Prevent double-queueing
-	
+
 	var angle_required = 0
 	var total_stretch_ratio = 0
 	var angle_for_child = []
@@ -155,20 +199,20 @@ func _resort():
 		angle_required += angle
 		angle_for_child.push_back(angle)
 		total_stretch_ratio += _get_child_stretch_ratio(child)
-	
+
 	if total_stretch_ratio > 0: # Division by zero otherwise
-		for i in range(children.size()): 
+		for i in range(children.size()):
 			var child = children[i]
 			angle_for_child[i] += (2 * PI - angle_required) * _get_child_stretch_ratio(child) / total_stretch_ratio
-	
+
 	var angle_reached = _start_angle
 	if !_start_empty:
 		angle_reached -= angle_for_child[0] / 2
-	
+
 	var appear = _percent_visible
 	if !_appear_at_once:
 		appear *= children.size()
-	
+
 	for i in range(children.size()):
 		var child = children[i]
 		_put_child_at_angle(child, radius, origin, angle_reached, angle_for_child[i], clamp(appear, 0, 1))
@@ -179,10 +223,10 @@ func _resort():
 func _put_child_at_angle(child, radius, origin, angle_start, angle_size, appear):
 	var size = _get_child_min_size(child)
 	var target = Vector2(0,-radius).rotated(-(angle_start + angle_size/2)) + origin
-	
+
 	if child is Control:
 		child.set_size(size)
-	
+
 	if _custom_animator_func != null:
 		_custom_animator_func.call_func(child, origin, target, appear)
 	else:
@@ -192,12 +236,12 @@ func _update_cached_min_size():
 	if !_cached_min_size_dirty:
 		return
 	_cached_min_size_dirty = false
-	
+
 	var children = _get_filtered_children()
-	
+
 	if children.size() == 0:
 		return
-	
+
 	var min_radius = 1
 	var min_child_size = Vector2()
 	var max_radius = 1
@@ -211,37 +255,38 @@ func _update_cached_min_size():
 		min_radius = max(min_radius, diagonal / 2)
 		max_radius += diagonal / 2
 		diagonals.push_back(diagonal)
-	
+
 	var key = str(diagonals)
 	if _cached_min_size_key == key:
 		return
-	
+
 #	var iter = 0
 	while max_radius > min_radius + 0.5:
 #		iter += 1
 		var new_radius = (max_radius + min_radius) / 2
-		
+
 		var angle_required = 0
 		for child in children:
 			angle_required += _get_max_angle_for_diagonal(_get_child_min_size(child).length(), new_radius)
-			
+
 		if angle_required < 2 * PI:
 			max_radius = new_radius # The angle needed is not high enough, we continue trying smaller values
 		else:
 			min_radius = new_radius # The angle needed is too high, we continue trying larger values
-	
+
 #	print(max_radius, "; found in ", iter, " iterations")
-	
+
 	_cached_min_size = Vector2(max_radius, max_radius) * 2 + min_child_size
 	_cached_min_size_key = key
-	
+
 	emit_signal("minimum_size_changed")
 
 func _default_animator(node:Control, container_center, target_pos:Vector2, time):
 	if node is Control:
 		node.set_position(container_center.linear_interpolate(target_pos - node.get_size() / 2 * time, time))
+		#NOTE: Personal lines here
 		node.rect_pivot_offset = Vector2(node.rect_size.x / 2, node.rect_size.y / 2) #My custom animator
-		node.set_rotation(target_pos.angle_to_point(container_center) + deg2rad(135))
+		node.set_rotation(target_pos.angle_to_point(container_center) + deg2rad(90))
 	else:
 		node.set_position(container_center.linear_interpolate(target_pos, time))
 	#node.set_opacity(time)
@@ -262,10 +307,10 @@ func _get_filtered_children():
 			keep = true
 		elif _allow_node2d and children[i] is Node2D:
 			keep = true
-		
+
 		if children[i] is CanvasItem and children[i].visible==false:
 			keep = false
-		
+
 		if !keep:
 			children.remove(i)
 	return children

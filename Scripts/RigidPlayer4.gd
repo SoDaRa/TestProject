@@ -87,15 +87,3 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 
 func _on_Timer_timeout():
 	apply_jump = true
-
-#	if Input.is_action_just_pressed("zoom_out"): 
-#NOTE: How to move it to a specific point in integrate forces
-#This can also be done in PlayerVer3 directly with position. However it won't conserve momentum that well. Good for portals I guess
-#		var my_transform = state.get_transform()
-#		var my_x = my_transform.x
-#		var my_y = my_transform.y
-#		var my_origin = Vector2(50,50)
-#		var new_transform = Transform2D(my_x, my_y, my_origin)
-#		print(my_transform)
-#		print(new_transform)
-#		state.set_transform(new_transform)
