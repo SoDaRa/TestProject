@@ -2,7 +2,6 @@ HIT SAVE TO SAVE CHANGES!
 
 To-Do
 - HUD element showing color selection
-    - Make it a radial color wheel
 - HUD element showing shapes available?
 - Options menu
 - Input mapping in-game
@@ -18,19 +17,18 @@ Questions to answer:
 - How large should levels be?
 - Should speed be tied to size?
 - Keyboard/Mouse Controls
-- Consider making the game a metroidvania maybe?
 - Make list of all unlocks and think how to spread them out.
 - Think up level themes.
 - Having movement & paint inputs be toggles so people don't have to hold a button
 
 Notes:
-- Make missions take place on seperate background or seperate layer to not overwrite what player drew on main.
 - Project Settings > Rendering > Environment > Default Clear Color
 - DON'T make edges of platforms black
 - Never set PlayerMask to invisible. Stops painting from working
 - Make sure Player's paint signal is connected to something to paint
 - Don't set the level size to 32000x32000. Not that it doesn't work, but zooming out lags like crazy and probably isn't worth being THAT large
 - Dummy_Button is just a button to test a feature without having to worry about any other input and SHOULD BE REMOVED IN FINAL BUILD!!!
+- left_click is just there to verify mouse release for the color wheel palette menu button
 
 Dialogue Tree Notes:
 - Conditionals in Dialogue Tree are handled as strings. Use placeholders to put info back into them.

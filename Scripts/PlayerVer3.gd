@@ -2,6 +2,7 @@ extends Node
 
 #Colors
 export var color_sequence = [Color(1, 1, 1, 1), Color(0, 1, 1, 1), Color(1, 0, 1, 1), Color(1, 1, 0, 1)] 
+var extra_color_queue = [Color.aquamarine, Color.beige, Color.chocolate, Color.orange, Color.gray]
 export var curr_color = 0
 
 #Collision
@@ -18,7 +19,7 @@ var custom_sprite = ImageTexture.new()
 
 var collision_outline_shader = preload("res://PlayerCollisionOutlineShader.tres")
 
-onready var CCPButtonContainer = get_node("ColorChoices/CenterContainer/ColorButtonsContainer")
+onready var PaletteMenu = get_node("ColorChoices/PaletteMenu")
 
 #Shape
 enum SHAPE {BALL, BOX, TRIANGLE, WALRUS, CUSTOM}
@@ -61,7 +62,9 @@ func _ready():
 	update_shape()
 	
 	for my_color in color_sequence:
-		CCPButtonContainer._add_color(my_color, self)
+#		CCPButtonContainer._add_color(my_color, self)
+		PaletteMenu.add_color(my_color)
+	PaletteMenu.connect("color_changed", self, "_color_picker_changed")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 # warning-ignore:unused_argument
@@ -81,8 +84,10 @@ func _process(delta):
 		else: #If somehow the last_valid_position isn't within the level_rect, then default to it's top left corner.
 			$PlayerBody.position = level_rect.position
 	
-#	if Input.is_action_just_pressed("Dummy_Button"):
-#		$PlayerBody.position = Vector2(-1000,-1000)
+	if Input.is_action_just_pressed("Dummy_Button"):
+		var new_color = extra_color_queue.pop_front()
+		color_sequence.append(new_color)
+		PaletteMenu.add_color(new_color)
 		
 #	if curr_shape != SHAPE.BALL: #Get rotation if not a ball
 #		MaskSprite.rotation_degrees = MySprite.rotation_degrees
@@ -104,7 +109,6 @@ func _process(delta):
 		curr_color = wrapi(curr_color, 0, color_sequence.size())
 		MySprite.modulate = color_sequence[curr_color]
 		
-	#TODO: Consider adjusting PlayerMask.Viewport.size with this. May make images smaller and easier to pass around sometimes.
 	#Size Swapping
 	if Input.is_action_pressed("decrease_size") && curr_size != MIN_SIZE:
 		var decreased_by = 1.0/BASE_SIZE      #HACK Probably should do this as a function and have more clear MAX and MIN
@@ -112,7 +116,6 @@ func _process(delta):
 		new_scale -= Vector2(decreased_by, decreased_by)
 
 		if new_scale.x > 0.1: #Ensure the collision shape doesn't get so small it causes problems
-#			RigidCollision.scale = new_scale
 			MySprite.scale = new_scale
 			MaskSprite.scale = new_scale
 			RigidCollision.shape = update_collision()
@@ -132,9 +135,10 @@ func _process(delta):
 		curr_size += 1
 		
 func _unhandled_input(event):
-	if event.is_action("palette_menu") && !CCPButtonContainer.is_visible() && !get_tree().paused:
+	if event.is_action("palette_menu") && !PaletteMenu.is_visible() && !get_tree().paused:
 		if Input.is_action_just_pressed("palette_menu"):
-			CCPButtonContainer.show()
+			PaletteMenu.set_top_slice(curr_color)
+			PaletteMenu.show()
 			return
 
 # warning-ignore:unused_argument
@@ -168,7 +172,6 @@ func _color_picker_changed(new_color, picker_name):
 
 func update_shape():
 	match(curr_shape):
-		#TODO: Generate collision for Collision shape on the fly
 		SHAPE.BALL:
 			MySprite.texture = ball_sprite
 			MaskSprite.texture = ball_sprite

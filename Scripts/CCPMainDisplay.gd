@@ -13,7 +13,7 @@ onready var CWheel: TextureRect = get_node("Display/ColorWheel")
 onready var Sample: ColorRect = get_node("Display/Sample")
 onready var SBar: ColorRect = get_node("Display/Sample/SaturationBar")
 onready var VBar: ColorRect = get_node("Display/Sample/ValueBar")
-onready var Preview: ColorRect = get_node("Preview")
+onready var Preview: ColorRect = get_node("VBoxContainer/Preview")
 onready var Selector: Sprite = get_node("Selector")
 
 #Emitted signals
@@ -134,10 +134,11 @@ func _process(delta): #Joypad axis are handled here instead of gui_input to make
 
 
 func _gui_input(event):
-	if InputMap.action_has_event("ui_accept", event):
+	if event.is_action("ui_accept") && Input.is_action_just_pressed("ui_accept"):
 		emit_signal("new_preset_selected", color)
-	if InputMap.action_has_event("ui_cancel", event):
-		self.accept_event()
+		accept_event()
+	if event.is_action("ui_cancel") && Input.is_action_just_pressed("ui_cancel"):
+		accept_event()
 		emit_signal("lose_focus")
 
 	if event is InputEventJoypadMotion:
@@ -176,10 +177,12 @@ func _update_color():
 	#Update Display
 	Sample.material.set_shader_param("picker_color", Color.from_hsv(hue, 1.0, 1.0))
 	Preview.set_frame_color(color)
+	
+		
 	SBar.set_frame_color(color.inverted())
 	VBar.set_frame_color(color.inverted())
 	
-	Selector.position = polar2cartesian(207, deg2rad(hue * 360)) + wheel_center #NOTE 207 is center of ring distance from center at (1,1) scale
+	Selector.position = polar2cartesian(210, deg2rad(hue * 360)) + wheel_center #NOTE 207 is center of ring distance from center at (1,1) scale
 	SBar.rect_position.x = saturation * 255
 	VBar.rect_position.y = (1.0 - value) * 255
 	

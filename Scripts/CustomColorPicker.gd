@@ -72,7 +72,7 @@ func _on_Main_new_preset_selected(new_color):
 		preset_color_button_array[preset_colors.size()-1].modulate = new_color
 		preset_color_button_array[preset_colors.size()-1].show()
 
-func _on_preset_selected(selected_color: Color): #When a preset is selected, update the color and display and emit signal
+func _on_preset_selected(selected_color: Color): #When a preset is selected, update the color, display and emit signal
 	self.set_pick_color(selected_color, true)
 	MainDisplay.color = selected_color
 	MainDisplay.grab_focus()
@@ -93,7 +93,6 @@ func _on_preset_removed(removed_color: Color, number: int):
 
 	if self.get_focus_owner() == null:  #Focus is usually lost if done on the last one, so best to put it back on the AddButton
 		$VBox/PresetBar/AddButton.grab_focus()
-	pass
 
 func _on_AddButton_pressed():
 	self._on_Main_new_preset_selected(color)

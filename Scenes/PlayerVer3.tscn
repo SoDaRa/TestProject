@@ -8,7 +8,7 @@
 [ext_resource path="res://Sprites/box.png" type="Texture" id=6]
 [ext_resource path="res://JumpAnimation.tres" type="Animation" id=7]
 [ext_resource path="res://Scenes/PlayerMask.tscn" type="PackedScene" id=8]
-[ext_resource path="res://Scripts/ColorChoices.gd" type="Script" id=9]
+[ext_resource path="res://Scenes/PaletteSelectionWheel.tscn" type="PackedScene" id=9]
 [ext_resource path="res://Scripts/TrailHandler.gd" type="Script" id=10]
 
 [sub_resource type="PhysicsMaterial" id=1]
@@ -65,22 +65,8 @@ margin_bottom = 37.5
 
 [node name="ColorChoices" type="CanvasLayer" parent="."]
 
-[node name="CenterContainer" type="CenterContainer" parent="ColorChoices"]
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-margin_left = -60.0
-margin_top = -60.0
-margin_right = -60.0
-margin_bottom = -60.0
-
-[node name="ColorButtonsContainer" type="GridContainer" parent="ColorChoices/CenterContainer"]
-pause_mode = 2
+[node name="PaletteMenu" parent="ColorChoices" instance=ExtResource( 9 )]
 visible = false
-focus_mode = 2
-columns = 2
-script = ExtResource( 9 )
 
 [node name="PlayerTrail" type="Node" parent="."]
 script = ExtResource( 10 )

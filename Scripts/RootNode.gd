@@ -33,11 +33,11 @@ func _ready():
 func _input(event):
 	if event.is_action("Dummy_Button") && on_mission: #FIXME: Have way to allow player out of mission
 		end_mission()
-	elif event.is_action("Dummy_Button") && Input.is_action_just_pressed("Dummy_Button"):
-		var new_type = $CanvasLayer/Colorblindness.Type
-		new_type += 1
-		new_type = wrapi(new_type, 0, 4)
-		$CanvasLayer/Colorblindness.set_type(new_type)
+#	elif event.is_action("Dummy_Button") && Input.is_action_just_pressed("Dummy_Button"):
+#		var new_type = $CanvasLayer/Colorblindness.Type
+#		new_type += 1
+#		new_type = wrapi(new_type, 0, 4)
+#		$CanvasLayer/Colorblindness.set_type(new_type)
 	if event.is_action("zoom_out"):
 		if Input.is_action_just_pressed("zoom_out") && !get_tree().paused:
 			get_tree().paused = true
