@@ -31,7 +31,7 @@ func _ready():
 
 	wheel_center = CWheel.rect_position + (CWheel.rect_size / 2) * CWheel.rect_scale
 
-	Selector.position = polar2cartesian(207, 0) + wheel_center #NOTE 207 is center of ring distance from center at (1,1) scale
+	Selector.position = polar2cartesian(207, 0) + wheel_center #207 is center of ring distance from center at (1,1) scale
 	SBar.set_frame_color(color.inverted())
 	VBar.set_frame_color(color.inverted())
 	pass # Replace with function body.
@@ -44,7 +44,7 @@ func _process(delta): #Joypad axis are handled here instead of gui_input to make
 		if Input.get_connected_joypads().size() > 0:
 			var update_needed = false
 			#Color Wheel (Right stick)
-			#TODO: Move right analog input handling to gui_input since doesn't need constant updates
+			#todo Move right analog input handling to gui_input since doesn't need constant updates
 			var rXAxis = Input.get_joy_axis(0, JOY_AXIS_2)
 			var rYAxis = Input.get_joy_axis(0, JOY_AXIS_3) 
 			if abs(rXAxis) > .5 || abs(rYAxis) > .5:

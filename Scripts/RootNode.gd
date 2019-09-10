@@ -6,7 +6,7 @@ var mission_rect: Rect2
 var curr_rect : Rect2
 const ZOOM_FACTOR = 5.8/4000.0 #Just found this fraction works well for zoom outs
 var self_paused = false
-var on_mission = false
+var on_mission = false #NOTE: Add to singleton
 var pos_holder: Vector2
 
 # Called when the node enters the scene tree for the first time.
@@ -25,6 +25,8 @@ func _ready():
 	err = $Level.connect("update_completed", $Player/PlayerTrail, "hide_trail")
 	assert(err == 0)
 	err = $Player.connect("painted", $Level, "_on_Player_paint")
+	assert(err == 0)
+	err = $OptionsLayer/OptionsMenu.connect("bg_save_requested", $Level, "save_background")
 	assert(err == 0)
 	curr_rect = main_level_rect
 	$Level.set_process(true)
@@ -51,8 +53,10 @@ func _input(event):
 			get_tree().paused = false
 			self_paused = false
 			PlayerCamera._reset()
-			fix_camera_bounds()
-			
+			fix_camera_bounds() #BUG: Zooming out in mission locks camera in weird way
+	if event.is_action("ui_end") && Input.is_action_just_pressed("ui_end") && !$OptionsLayer/OptionsMenu.is_visible():
+		get_tree().set_input_as_handled()
+		$OptionsLayer/OptionsMenu.show()
 
 func _on_MyMan_start_mission(m_overlay_path : String):
 	mission_rect = $Mission.mission_start(m_overlay_path)

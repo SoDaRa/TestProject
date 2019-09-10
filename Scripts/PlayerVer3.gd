@@ -2,7 +2,7 @@ extends Node
 
 #Colors
 export var color_sequence = [Color(1, 1, 1, 1), Color(0, 1, 1, 1), Color(1, 0, 1, 1), Color(1, 1, 0, 1)] 
-var extra_color_queue = [Color.aquamarine, Color.beige, Color.chocolate, Color.orange, Color.gray]
+var extra_color_queue = [Color.aquamarine, Color.purple, Color.chocolate, Color.orange, Color.gray]
 export var curr_color = 0
 
 #Collision
@@ -25,7 +25,7 @@ onready var PaletteMenu = get_node("ColorChoices/PaletteMenu")
 enum SHAPE {BALL, BOX, TRIANGLE, WALRUS, CUSTOM}
 export(SHAPE) onready var starting_shape
 onready var curr_shape = starting_shape
-var shapes_available = 3
+var shapes_available = 5
 
 #"Stay in-bounds"
 var level_rect = Rect2(Vector2(0,0), Vector2(100,100)) 	#Used to define where out of bounds is. Is set up by parent/RootNode.gd
@@ -85,9 +85,10 @@ func _process(delta):
 			$PlayerBody.position = level_rect.position
 	
 	if Input.is_action_just_pressed("Dummy_Button"):
-		var new_color = extra_color_queue.pop_front()
-		color_sequence.append(new_color)
-		PaletteMenu.add_color(new_color)
+		if !extra_color_queue.empty():
+			var new_color = extra_color_queue.pop_front()
+			color_sequence.append(new_color)
+			PaletteMenu.add_color(new_color)
 		
 #	if curr_shape != SHAPE.BALL: #Get rotation if not a ball
 #		MaskSprite.rotation_degrees = MySprite.rotation_degrees
@@ -214,6 +215,7 @@ func update_collision() -> Shape2D:
 		SHAPE.BALL: 
 			new_collision = CircleShape2D.new()
 			new_collision.set_radius(float(curr_size) / 2.0)
+		
 		SHAPE.TRIANGLE:
 			new_collision = ConvexPolygonShape2D.new()
 			var new_vector_pool = PoolVector2Array()
@@ -223,6 +225,7 @@ func update_collision() -> Shape2D:
 				var new_vector = new_vector_pool[idx] * scale
 				new_vector_pool.set(idx, new_vector)
 			new_collision.set_points(new_vector_pool)
+		
 		_:		#This is the case for the box, walrus and custom modes.
 			new_collision = RectangleShape2D.new()
 			var new_extends = Vector2(float(curr_size) / 2.0, float(curr_size) / 2.0)

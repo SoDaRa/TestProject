@@ -20,7 +20,7 @@ func _ready():
 func _notification(what):
 	match(what):
 		NOTIFICATION_POST_POPUP:
-			custom_picker.color = color
+			custom_picker.set_pick_color(color)
 			set_process_input(true)
 		NOTIFICATION_POPUP_HIDE:
 			emit_signal("color_changed", color)
@@ -32,7 +32,7 @@ func _input(event: InputEvent):
 			custom_picker._on_lose_focus()
 
 func close_picker(): #Just to help close the picker
-	color = custom_picker.color
+	color = custom_picker.get_pick_color()
 	emit_signal("color_changed", color)
 	hide()
 

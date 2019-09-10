@@ -99,5 +99,5 @@ func _on_AddButton_pressed(): #Largely redundant but gives the AddButton some us
 	if self.get_focus_owner() == null:  #Prevents losing the focus completely if AddButton was hidden
 		get_node("VBox/PresetBar/9").grab_focus()
 
-func _on_lose_focus():  #HACK: Have to connect to something to help get the focus off it
+func _on_lose_focus():  #hackHave to connect to something to help get the focus off it
 	emit_signal("lose_focus")

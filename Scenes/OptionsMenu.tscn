@@ -1,44 +1,89 @@
-[gd_scene format=2]
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Scenes/OptionsMenu.gd" type="Script" id=1]
+[ext_resource path="res://Scenes/KeyBindingControl.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Comfortaa-Bold.ttf" type="DynamicFontData" id=3]
+
+[sub_resource type="DynamicFont" id=1]
+size = 40
+outline_size = 3
+outline_color = Color( 0, 0, 0, 1 )
+font_data = ExtResource( 3 )
 
 [node name="Control" type="Control"]
+pause_mode = 2
 anchor_right = 1.0
 anchor_bottom = 1.0
+script = ExtResource( 1 )
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
-margin_right = 40.0
-margin_bottom = 40.0
-
-[node name="TabContainer" type="TabContainer" parent="."]
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -21.5
-margin_top = -28.0
-margin_right = 21.5
-margin_bottom = 28.0
+margin_left = -100.0
+margin_top = -234.5
+margin_right = 100.0
+margin_bottom = 234.5
 
-[node name="Button3" type="Button" parent="TabContainer"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = -24.0
-margin_right = -8.0
-margin_bottom = -40.0
-text = "Exit"
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_right = 200.0
+margin_bottom = 469.0
+custom_constants/separation = 23
 
-[node name="Button2" type="Button" parent="TabContainer"]
-visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = -24.0
-margin_right = -1.0
-margin_bottom = -60.0
-text = "Options"
-
-[node name="Button" type="Button" parent="TabContainer"]
-visible = false
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_top = -24.0
-margin_bottom = -60.0
+[node name="Resume" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_right = 200.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 200, 100 )
 text = "Resume"
+
+[node name="KeyBindings" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 123.0
+margin_right = 200.0
+margin_bottom = 223.0
+rect_min_size = Vector2( 200, 100 )
+text = "Edit Key Bindings"
+
+[node name="SaveBG" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 246.0
+margin_right = 200.0
+margin_bottom = 346.0
+rect_min_size = Vector2( 200, 100 )
+text = "Save Background"
+
+[node name="Exit" type="Button" parent="CenterContainer/VBoxContainer"]
+margin_top = 369.0
+margin_right = 200.0
+margin_bottom = 469.0
+rect_min_size = Vector2( 200, 100 )
+disabled = true
+text = "Exit Game"
+
+[node name="InputEditor" parent="." instance=ExtResource( 2 )]
+visible = false
+
+[node name="WaitLabel" type="Label" parent="."]
+visible = false
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -177.0
+margin_top = -47.5
+margin_right = 177.0
+margin_bottom = 47.5
+custom_fonts/font = SubResource( 1 )
+text = "Save in progress
+Please Wait"
+align = 1
+valign = 1
+
+[node name="Tween" type="Tween" parent="WaitLabel"]
+
+[node name="DelayTimer" type="Timer" parent="."]
+one_shot = true
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Resume" to="." method="_on_Resume_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/KeyBindings" to="." method="_on_KeyBindings_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/SaveBG" to="." method="_on_SaveBG_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Exit" to="." method="_on_Exit_pressed"]
+[connection signal="timeout" from="DelayTimer" to="." method="_on_DelayTimer_timeout"]

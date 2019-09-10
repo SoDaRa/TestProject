@@ -1,9 +1,9 @@
 extends Node2D
 
 var percent_thread = Thread.new() 			#Thread for processing percent
-var save_background_thread = Thread.new()	#Thread for saving the background
+#var save_background_thread = Thread.new()	#Thread for saving the background
 var percent_colored = 0.0
-var save_bg_next_pass = false
+#var save_bg_next_pass = false
 
 var image_array = []					#Holds the various background images after an update. Copied to threads for use
 var scale_bg_image_by = Vector2(1.0,1.0)
@@ -59,7 +59,7 @@ func _ready():
 			bg_node_array[curr_index].position = node_position
 			bg_node_array[curr_index].index_id = curr_index
 			bg_node_array[curr_index].setup(node_bg_size_vector, node_sprite_size_vector, bg_color, scale_bg_image_by)
-			bg_node_array[curr_index].connect("update_complete", self, "_on_BGNode_update_complete")
+			bg_node_array[curr_index].connect("update_complete", self, "_progress_update")
 			
 			image_array.append(Image.new())
 #			bg_node_array[curr_index].connect("update_start", self, "_on_BGNode_update_start")
@@ -83,20 +83,17 @@ func _ready():
 
 # warning-ignore:unused_argument
 func _process(delta):
-#	if Input.is_action_just_pressed("Dummy_Button"):
-#		var num_1 = ceil(LEVEL_SIZE.x / BG_NODE_SIZE)
-#		print(num_1)
 	if Input.is_action_just_released("paint"):
 		if nodes_to_update == -1:
 			start_update() #NOTE: Release update start 
 #			print("Background Update: Release") 
 		
-	if Input.is_action_just_pressed("save_background"):
-		var bg_updated = nodes_to_update == -1 && paint_log.size() == 0
-		if !save_background_thread.is_active() && get_tree().paused == false && bg_updated: 
-			save_background_thread.start(self, "save_background", image_array)
-		elif !save_background_thread.is_active() && get_tree().paused == false && !bg_updated: 
-			save_bg_next_pass = true #Shouldn't do it right now but will do it after next update is complete
+#	if Input.is_action_just_pressed("save_background"):
+#		var bg_updated = nodes_to_update == -1 && paint_log.size() == 0
+#		if !save_background_thread.is_active() && get_tree().paused == false && bg_updated: 
+#			save_background_thread.start(self, "save_background", image_array)
+#		elif !save_background_thread.is_active() && get_tree().paused == false && !bg_updated: 
+#			save_bg_next_pass = true #Shouldn't do it right now but will do it after next update is complete
 
 # warning-ignore:unused_argument
 func percent_calc(my_img_array: Array):
@@ -119,17 +116,20 @@ func percent_calc_done():
 	if percentage > percent_colored:
 		percent_colored = percentage
 
-func save_background(my_img_array: Array):
+func save_background(): #Old arg my_img_array: Array
+	var my_img_array = []
+	for bg_node in bg_node_array:
+		my_img_array.append(bg_node.bg)
 	var curr_time = OS.get_datetime()
 	var image_name = "MyImage" + str(curr_time.month) + "_" + str(curr_time.day) + "_" + str(curr_time.year) + "_" + \
 								 str(curr_time.hour)  + "_" + str(curr_time.minute) + "_" + str(curr_time.second) + ".png"
 	var my_bg = bg_from_array(my_img_array)
 	my_bg.save_png(image_name)
-	call_deferred("save_background_done")
-
-func save_background_done():
-	save_background_thread.wait_to_finish()
 	print("Background Save Complete")
+
+#func save_background_done():
+#	save_background_thread.wait_to_finish()
+#	print("Background Save Complete")
 
 func _on_Player_paint(mask: Image, mask_pos: Vector2):
 	var new_pos = mask_pos - self.position
@@ -151,22 +151,20 @@ func start_update():
 	var curr_node = -1
 	nodes_to_update = paint_log.size() - 1
 	if nodes_to_update == -1:
-		print("Cancel Update: No nodes to process")
+#		print("Cancel Update: No nodes to process")
 		return
 	#Swap the lists
 	while paint_log.size() > 0:
 		bg_update_list.push_back(paint_log.pop_front())
 	curr_node = bg_update_list.pop_back()
 	
-	if curr_node == null:
-		print("Cancel Update: curr_node null")
-		return
+	assert(curr_node != null)
 	assert(curr_node >= 0)
 	assert(curr_node < bg_node_array.size())
 	bg_node_array[curr_node].start_sprite_update()
 	emit_signal("update_started")
 	
-func _on_BGNode_update_complete(bg_image:Image, node_idx: int):
+func _progress_update(bg_image:Image, node_idx: int):
 #	print("Node Ending Update: ", node_idx)
 	image_array[node_idx] = bg_image #TODO: Make this not cause so much lagggg. Access sprites to get in chunks?
 	nodes_to_update -= 1
@@ -189,9 +187,9 @@ func end_update():
 	if !percent_thread.is_active() && get_tree().paused == false: 
 		percent_thread.start(self, "percent_calc", image_array)
 	#Save bg now that image_array is up to date
-	if save_bg_next_pass && !save_background_thread.is_active(): 
-		save_background_thread.start(self, "save_background", image_array)
-		save_bg_next_pass = false
+#	if save_bg_next_pass && !save_background_thread.is_active(): 
+#		save_background_thread.start(self, "save_background", image_array)
+#		save_bg_next_pass = false
 	emit_signal("update_completed")
 #	print("Node processing complete")
 #	print(" ")

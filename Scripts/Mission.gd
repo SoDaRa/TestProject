@@ -6,12 +6,8 @@ var percent_colored = 0.0
 var bg_color = Color(0,0,0,0)
 var bg_copy: Image
 
-#export var mission_bg = preload("res://Sprites/MissionBG.png") #TODO: Have this be editable
 var MISSION_SIZE: Vector2		#Total size of the level and background
-var BG_NODE_SIZE: Vector2 		#Size of an individual background node's image #TODO: Remove this if I'm not going to use it
 var BG_SPRITE_SIZE = 250 		#Size of the sprites that make up the background node's. See BGHandler.gd for more
-
-
 
 var bg_node = preload("res://Scenes/BGNode.tscn")
 var my_bg_node
@@ -28,7 +24,6 @@ func _ready():
 func mission_start(mission_bg : String) -> Rect2:
 	var m_texture = load(mission_bg)
 	MISSION_SIZE = Vector2(m_texture.get_data().get_width(), m_texture.get_data().get_height())
-	BG_NODE_SIZE = MISSION_SIZE
 	var sprite_size_vector = Vector2(BG_SPRITE_SIZE, BG_SPRITE_SIZE)
 	#Setup bg_nodes
 	my_bg_node = bg_node.instance()
@@ -77,7 +72,6 @@ func percent_calc(my_img: Image):
 		for y in range(100):
 			if compressed_image.get_pixel(x, y) != bg_color:
 				count += 1
-				
 	
 	var percent = (float(count) / 10000.0) * 100
 	compressed_image.unlock()
@@ -113,7 +107,7 @@ func end_update():
 	if !percent_thread.is_active() && get_tree().paused == false: 
 		var thread_copy = Image.new()
 		thread_copy.copy_from(bg_copy)
-		percent_thread.start(self, "percent_calc", thread_copy) #BUG: Percent calculation not returning. Why?
+		percent_thread.start(self, "percent_calc", thread_copy)
 	emit_signal("update_completed")
 #	print("Node processing complete")
 #	print(" ")

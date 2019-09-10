@@ -184,7 +184,7 @@ func _resort():
 		var size = _get_child_min_size(child)
 		min_child_size.x = max(min_child_size.x, size.x)
 		min_child_size.y = max(min_child_size.y, size.y)
-#NOTE: Radius calculation here. Default is " / 2"
+#note Radius calculation here. Default is " / 2"
 	var radius = min(rect.size.x - min_child_size.x, rect.size.y - min_child_size.y) / children.size() #2.8 works at 4
 	
 	if !_cached_min_size_dirty:
@@ -284,7 +284,7 @@ func _update_cached_min_size():
 func _default_animator(node:Control, container_center, target_pos:Vector2, time):
 	if node is Control:
 		node.set_position(container_center.linear_interpolate(target_pos - node.get_size() / 2 * time, time))
-		#NOTE: Personal lines here
+		#note Personal lines here
 		node.rect_pivot_offset = Vector2(node.rect_size.x / 2, node.rect_size.y / 2) #My custom animator
 		node.set_rotation(target_pos.angle_to_point(container_center) + deg2rad(90))
 	else:

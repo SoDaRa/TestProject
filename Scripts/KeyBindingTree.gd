@@ -16,7 +16,7 @@ class CustomSorter:
 			"next_color": return 5
 			"previous_color": return 6
 			"swap_shape": return 7
-			"swap_player_physics": return 8
+			"swap_physics": return 8
 			"interact": return 9
 			"palette_menu": return 10
 			"increase_size": return 11
@@ -24,7 +24,7 @@ class CustomSorter:
 			"rotate_cw": return 13
 			"rotate_ccw": return 14
 			"zoom_out": return 15
-			"save_background": return 16
+#			"save_background": return 16
 #			"Dummy_Button": return 17
 
 			"ui_up": return 0
@@ -50,7 +50,7 @@ class CustomSorter:
 
 			_: return 37
 
-
+const erase_actions = ["Dummy_Button", "left_click", "ui_end", "ui_home", "ui_page_up", "ui_page_down", "ui_focus_next", "ui_focus_prev"]
 #Actual variables
 onready var input_actions = InputMap.get_actions()
 var action_input_dict = {}
@@ -60,10 +60,9 @@ var count = 0
 func _ready():
 	set_process(false)
 	input_actions.sort_custom(CustomSorter, "my_sort") #Sort the array of InputMap Actions so they display consistently
-	#Removing unused actions
-	input_actions.erase("Dummy_Button")
-	input_actions.erase("ui_end")
-	input_actions.erase("ui_home")
+	#Removing unused/unmodifiable actions
+	for bad_action in erase_actions:
+		input_actions.erase(bad_action)
 	#Create Root and designated sections
 	var root = self.create_item()
 
@@ -79,30 +78,27 @@ func _ready():
 	gameplay_section.set_text(0, " Gameplay")
 	ui_section.set_text(0, " UI / Menus")
 	color_picker_section.set_text(0, " Color Picker")
-
+	#Misc
+	set_column_min_width(0, 150)
+	set_column_expand(0, false)
+	
 	#Get the actions for each input
 	for action in input_actions:
 		action_input_dict[action] = InputMap.get_action_list(action)
-
+		
 		#UI Actions
 		if action.begins_with("ui"):
-			var ui_item = self.create_item(ui_section)
+			var ui_item = create_item(ui_section)
 			#Set row name
 			var row_text = " " + action.capitalize()
 			row_text = row_text.replace("Ui ", "")
-
 			ui_item.set_text(0, row_text)
-			#Text for keyboard and joypad columns
-			var keyboard_mouse_text = keyboard_mouse_controls(action)
-			var joypad_text = joypad_controls(action)
-			#Set into column
-			ui_item.set_text(1, keyboard_mouse_text)
-			ui_item.set_text(2, joypad_text)
-			#Set metadata so it can be used to reference which action this corresponds to
-			ui_item.set_metadata(0, action)
+			
+			set_item_columns(ui_item, action)
+			ui_item.set_metadata(0, action) #Set metadata so it can be used to reference which action this corresponds to
 		#Custom Color Picker Actions
 		elif action.begins_with("ccp"):
-			var ccp_item = self.create_item(color_picker_section)
+			var ccp_item = create_item(color_picker_section)
 			#Set row name
 			var row_text = action.replace("ccp_", "")
 			row_text = " " + row_text.capitalize()
@@ -110,20 +106,13 @@ func _ready():
 				row_text = row_text.replace("Cw", "CW")
 			if row_text.find("Ccw") != -1:
 				row_text = row_text.replace("Ccw", "CCW")
-
 			ccp_item.set_text(0, row_text)
-			#Text for keyboard and joypad columns
-			var keyboard_mouse_text = keyboard_mouse_controls(action)
-			var joypad_text = joypad_controls(action)
-
-			#Set into column
-			ccp_item.set_text(1, keyboard_mouse_text)
-			ccp_item.set_text(2, joypad_text)
-			#Set metadata so it can be used to reference which action this corresponds to
-			ccp_item.set_metadata(0, action)
+			
+			set_item_columns(ccp_item, action)
+			ccp_item.set_metadata(0, action) #Set metadata so it can be used to reference which action this corresponds to
 		#Gameplay/Misc Actions
 		else:
-			var gameplay_item = self.create_item(gameplay_section)
+			var gameplay_item = create_item(gameplay_section)
 			#Set row name
 			var row_text = " " + action.capitalize()
 			if row_text.find("Cw") != -1:
@@ -132,16 +121,11 @@ func _ready():
 				row_text = row_text.replace("Ccw", "CCW")
 			if row_text.find("Up") != -1:
 				row_text = row_text.replace("Up", "Up / Jump")
-
 			gameplay_item.set_text(0, row_text)
-			#Text for keyboard and joypad columns
-			var keyboard_mouse_text = keyboard_mouse_controls(action)
-			var joypad_text = joypad_controls(action)
-			#Set into column
-			gameplay_item.set_text(1, keyboard_mouse_text)
-			gameplay_item.set_text(2, joypad_text)
-			#Set metadata so it can be used to reference which action this corresponds to
-			gameplay_item.set_metadata(0, action) #TODO: Setup alternating colors
+			
+			set_item_columns(gameplay_item, action)
+			gameplay_item.set_metadata(0, action) #Set metadata so it can be used to reference which action this corresponds to
+		#TODO: Setup alternating colors
 
 
 func _gui_input(event):
@@ -157,6 +141,7 @@ func _gui_input(event):
 	else:
 		set_process(false)
 
+
 func _process(delta): #BUG: If you switch from arrow keys to other buttons, it may skip an entry or not move but fixes itself.
 	if Input.is_action_pressed("ui_up") && get_selected() != null && delay == 0 && !Input.is_key_pressed(KEY_UP):
 		if get_selected().get_prev_visible() != null && get_selected().get_prev_visible().is_selectable(0):
@@ -166,7 +151,6 @@ func _process(delta): #BUG: If you switch from arrow keys to other buttons, it m
 			get_selected().get_next_visible().select(0)
 	if !Input.is_action_pressed("ui_up") && !Input.is_action_pressed("ui_down"):
 		set_process(false)
-		print("exit process in process")
 		return
 	ensure_cursor_is_visible()
 	if delay == 0:
@@ -178,14 +162,39 @@ func _process(delta): #BUG: If you switch from arrow keys to other buttons, it m
 			delay = 0.0
 	else: delay = 0.0
 
-func update_item():
+func update_selected_item():
 	var action_item = get_selected()
 	var action = action_item.get_metadata(0)
 	action_input_dict[action] = InputMap.get_action_list(action)
+	set_item_columns(action_item, action)
+	
+func update_item(action: String, category: String):
+	#Find the appropriate category
+	var curr_category = get_root().get_children()
+	while curr_category != null:
+		if curr_category.get_text(0).find(category) != -1:
+			break
+		curr_category = curr_category.get_next()
+	if curr_category == null:
+		return
+	#Find the item in the category
+	var curr_item = curr_category.get_children()
+	while curr_item != null:
+		if curr_item.get_metadata(0) == action:
+			break
+		curr_item = curr_item.get_next()
+	if curr_item == null:
+		return
+	#Update that item
+	action_input_dict[action] = InputMap.get_action_list(action)
+	set_item_columns(curr_item, action)
+
+func set_item_columns(item: TreeItem, action: String):
 	var keyboard_mouse_text = keyboard_mouse_controls(action)
 	var joypad_text = joypad_controls(action)
-	action_item.set_text(1, keyboard_mouse_text)
-	action_item.set_text(2, joypad_text)
+	#Set into column
+	item.set_text(1, keyboard_mouse_text)
+	item.set_text(2, joypad_text)
 
 func joypad_controls(action:String) -> String:
 	var joypad_controls = "  "
@@ -197,7 +206,7 @@ func joypad_controls(action:String) -> String:
 	return joypad_controls
 
 func keyboard_mouse_controls(action:String) -> String:
-	var kbm_controls = "  "
+	var kbm_controls = "  " #kbm = keyboard_mouse
 	for input in action_input_dict[action]:
 		if input is InputEventMouseButton:
 			kbm_controls = kbm_controls + mouse_button_string(input) + ", "
@@ -239,4 +248,3 @@ func mouse_button_string(button: InputEventMouseButton) -> String:
 		8: return "Mouse 4"
 		9: return "Mouse 5"
 		_: return "Unknown"
-

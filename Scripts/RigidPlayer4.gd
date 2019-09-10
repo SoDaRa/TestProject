@@ -21,7 +21,7 @@ var curr_mode = RIG_MODE
 
 func _integrate_forces(state: Physics2DDirectBodyState):
 	#Swap Physics Mode
-	if Input.is_action_just_pressed("swap_player_physics"):
+	if Input.is_action_just_pressed("swap_physics"):
 		if curr_mode == RIG_MODE:
 			curr_mode = KIN_MODE
 			self.custom_integrator = true   #To disable gravity and allowing the player to fly instead.
@@ -38,19 +38,19 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 		#Jump
 		var required_jump_checks = state.get_contact_count() > 0 && state.linear_velocity.y > -MAX_VERTICAL_SPEED
 		if Input.is_action_pressed("up") && required_jump_checks:
-			if Input.is_action_just_pressed("up"): #For people able to mash
+			if Input.is_action_just_pressed("up") : #For people able to mash
 				emit_signal("jumping")
-				$AnimationDelay.start()
+				$AnimationDelay.start(0.1)
 				$JumpDelay.start(0.3)
 			elif $JumpDelay.get_time_left() == 0: #For people who have a motor disability and would rather hold the button.
 				emit_signal("jumping")
-				$AnimationDelay.start()
+				$AnimationDelay.start(0.1)
 				$JumpDelay.start(0.3)
 			
 		if apply_jump == true:
 			state.apply_central_impulse(Vector2(0,jump_strength * -1))
 			apply_jump = false
-
+	
 	#Kinematic Mode
 	elif curr_mode == KIN_MODE:
 		var velocity = Vector2(0,0)

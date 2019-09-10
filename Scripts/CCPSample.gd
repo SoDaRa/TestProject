@@ -5,11 +5,12 @@ var my_shader = preload("res://Themes_Shaders/ColorPickerSample.shader")
 
 signal mouse_input(pos)
 
-#This exists solely to ensure it's unique upon loading
+#Ensures shader is unique upon loading
 func _ready():
 	my_material.shader = my_shader
 	self.material = my_material
 
+#Gets mouse input
 func _gui_input(event):
 	if event is InputEventMouse:
 		if event.get_button_mask() & BUTTON_MASK_LEFT:

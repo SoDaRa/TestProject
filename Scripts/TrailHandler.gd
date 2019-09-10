@@ -11,7 +11,8 @@ var buffer_2 = []
 var buffer_idx = BUFFER_LENGTH - 1 	#Keeps track of which buffer trail sprite is to be used next
 var buffer_1_in_use = false 		#Refers to if buffer_1 is currently displayed
 
-var use_main = true	#This is just used to swap to using the buffer for updates not triggered by using up the main trail
+#This is just used to swap to using the buffer for updates not triggered by using up the main trail
+var use_main = true
 
 signal main_empty
 
@@ -62,8 +63,7 @@ func draw_trail(mask: Image, mask_pos:Vector2, player_color:Color):
 		_draw_main(mask_info)
 	else:
 		_draw_buffer(mask_info)
-	
-#Trail Code
+
 func _draw_main(mask_info: Dictionary):
 	#Putting at player position
 	_update_sprite(trail_array[trail_idx], mask_info)
@@ -103,6 +103,6 @@ func _update_sprite(to_update: Sprite, mask_info: Dictionary):
 	to_update.position = mask_info["pos"]
 	to_update.texture = sprite_texture
 	to_update.modulate = Color(1.0, 1.0, 1.0, 1.0)
-	
+
 func swap_to_buffer():
 	use_main = false

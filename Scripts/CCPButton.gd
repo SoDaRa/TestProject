@@ -28,7 +28,7 @@ func _ready():
 
 func _pressed():
 	custom_picker.color = color
-	for idx in range(presets.size()):  #TODO: Set a variable to the picker to use to remove redundancy
+	for idx in range(presets.size()):  #Set a variable to the picker to use to remove redundancy
 		custom_picker.add_preset(presets[idx])
 	presets.resize(0)
 	custom_popup.popup_centered()

@@ -41,7 +41,7 @@ func _ready():
 func _pressed():
 	if joy_button_pressed || mouse_button_pressed:
 		custom_picker.color = color
-		for idx in range(presets.size()):  #TODO: Set a variable to the picker to use to remove redundancy
+		for idx in range(presets.size()):  #todoSet a variable to the picker to use to remove redundancy
 			custom_picker.add_preset(presets[idx])
 		presets.resize(0)
 		joypad_popup.popup_centered()

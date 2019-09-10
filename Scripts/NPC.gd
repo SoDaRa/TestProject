@@ -8,7 +8,7 @@ var mission_overlay_path = "res://Sprites/MissionBG.png"
 var my_font: DynamicFont
 var dialogue_ui: Panel
 var text_tween: Tween	
-#Could have had tween node in the NPC scene to do the same thing, but referencing the one in the ui guarentees a consistent reference
+#Could have had tween node in the NPC scene to do the same thing, but referencing the one in the ui guarentees a consistent reference-
 #if this NPC doesn't need a tween
 var chars_per_sec = 50.0
 var in_choice = false
@@ -126,7 +126,8 @@ func _on_Dialogue_Conditonal_Data_Needed(ref):
 	if !mission_completed:
 		$Dialogue.send_conditonal_data({"mission_status" : "not completed"})
 	else:
-		if mission_accepted == true: #FIXME: Use a different variable for this. Currently here to decide if the mission was just done or not.
+		#FIXME: Use a different variable for this. Currently here to decide if the mission was just done or not.
+		if mission_accepted == true: 
 			$Dialogue.send_conditonal_data({"mission_status" : "just completed"})
 			mission_accepted = false
 		else:
