@@ -1,6 +1,6 @@
 extends Node2D
 #TODO: Find way to have this and Level extend the same class
-var percent_thread = Thread.new() 			#Thread for processing percent
+var percent_thread = Thread.new() #Thread for processing percent
 var percent_colored = 0.0
 
 var bg_color = Color(0,0,0,0)
@@ -26,6 +26,8 @@ func mission_start(mission_bg : String) -> Rect2:
 	MISSION_SIZE = Vector2(m_texture.get_data().get_width(), m_texture.get_data().get_height())
 	var sprite_size_vector = Vector2(BG_SPRITE_SIZE, BG_SPRITE_SIZE)
 	#Setup bg_nodes
+	if my_bg_node != null:
+		my_bg_node.queue_free()
 	my_bg_node = bg_node.instance()
 	call_deferred("add_child", my_bg_node)
 	my_bg_node.position = Vector2(0,0)

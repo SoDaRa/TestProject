@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://Scripts/PlayerVer3.gd" type="Script" id=1]
 [ext_resource path="res://Scripts/RigidPlayer4.gd" type="Script" id=2]
@@ -7,9 +7,10 @@
 [ext_resource path="res://PlayerCollisionOutlineShader.tres" type="Material" id=5]
 [ext_resource path="res://Sprites/box.png" type="Texture" id=6]
 [ext_resource path="res://JumpAnimation.tres" type="Animation" id=7]
-[ext_resource path="res://Scenes/PlayerMask.tscn" type="PackedScene" id=8]
-[ext_resource path="res://Scenes/PaletteSelectionWheel.tscn" type="PackedScene" id=9]
-[ext_resource path="res://Scripts/TrailHandler.gd" type="Script" id=10]
+[ext_resource path="res://Sprites/select_pointer.png" type="Texture" id=8]
+[ext_resource path="res://Scenes/PlayerMask.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Scenes/PaletteSelectionWheel.tscn" type="PackedScene" id=10]
+[ext_resource path="res://Scripts/TrailHandler.gd" type="Script" id=11]
 
 [sub_resource type="PhysicsMaterial" id=1]
 friction = 0.5
@@ -21,6 +22,7 @@ script = ExtResource( 1 )
 
 [node name="PlayerBody" type="RigidBody2D" parent="."]
 pause_mode = 1
+editor/display_folded = true
 physics_material_override = SubResource( 1 )
 contacts_reported = 2
 can_sleep = false
@@ -48,6 +50,7 @@ wait_time = 0.3
 one_shot = true
 
 [node name="SpriteScale" type="Node2D" parent="."]
+editor/display_folded = true
 
 [node name="PlayerSprite" type="Sprite" parent="SpriteScale"]
 material = ExtResource( 5 )
@@ -56,7 +59,14 @@ texture = ExtResource( 6 )
 [node name="AnimationPlayer" type="AnimationPlayer" parent="SpriteScale"]
 anims/JumpAnimation = ExtResource( 7 )
 
-[node name="PlayerMask" parent="." instance=ExtResource( 8 )]
+[node name="DirectionArrow" type="Sprite" parent="SpriteScale"]
+scale = Vector2( 1, -1 )
+texture = ExtResource( 8 )
+offset = Vector2( 0, 60 )
+
+[node name="Tween" type="Tween" parent="SpriteScale/DirectionArrow"]
+
+[node name="PlayerMask" parent="." instance=ExtResource( 9 )]
 self_modulate = Color( 1, 1, 1, 0 )
 margin_left = -37.5
 margin_top = -37.5
@@ -64,11 +74,12 @@ margin_right = 37.5
 margin_bottom = 37.5
 
 [node name="ColorChoices" type="CanvasLayer" parent="."]
+editor/display_folded = true
 
-[node name="PaletteMenu" parent="ColorChoices" instance=ExtResource( 9 )]
+[node name="PaletteMenu" parent="ColorChoices" instance=ExtResource( 10 )]
 visible = false
 
 [node name="PlayerTrail" type="Node" parent="."]
-script = ExtResource( 10 )
+script = ExtResource( 11 )
 [connection signal="jumping" from="PlayerBody" to="." method="_on_RigidBody2D_jumping"]
 [connection signal="timeout" from="PlayerBody/AnimationDelay" to="PlayerBody" method="_on_Timer_timeout"]

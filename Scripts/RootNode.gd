@@ -8,6 +8,7 @@ const ZOOM_FACTOR = 5.8/4000.0 #Just found this fraction works well for zoom out
 var self_paused = false
 var on_mission = false #NOTE: Add to singleton
 var pos_holder: Vector2
+onready var MyOptionsMenu = get_node("OptionsLayer/OptionsMenu")
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -26,15 +27,15 @@ func _ready():
 	assert(err == 0)
 	err = $Player.connect("painted", $Level, "_on_Player_paint")
 	assert(err == 0)
-	err = $OptionsLayer/OptionsMenu.connect("bg_save_requested", $Level, "save_background")
+	err = MyOptionsMenu.connect("bg_save_requested", $Level, "save_background")
+	assert(err == 0)
+	err = MyOptionsMenu.connect("mission_end_requested", self, "end_mission")
 	assert(err == 0)
 	curr_rect = main_level_rect
 	$Level.set_process(true)
 	$Mission.set_process(false)
 
 func _input(event):
-	if event.is_action("Dummy_Button") && on_mission: #FIXME: Have way to allow player out of mission
-		end_mission()
 #	elif event.is_action("Dummy_Button") && Input.is_action_just_pressed("Dummy_Button"):
 #		var new_type = $CanvasLayer/Colorblindness.Type
 #		new_type += 1
@@ -54,9 +55,10 @@ func _input(event):
 			self_paused = false
 			PlayerCamera._reset()
 			fix_camera_bounds() #BUG: Zooming out in mission locks camera in weird way
-	if event.is_action("ui_end") && Input.is_action_just_pressed("ui_end") && !$OptionsLayer/OptionsMenu.is_visible():
-		get_tree().set_input_as_handled()
-		$OptionsLayer/OptionsMenu.show()
+	if event.is_action("ui_end") && Input.is_action_just_pressed("ui_end") && !get_tree().paused:
+		if !$DialogueLayer/DialogueUI.is_visible() && !$OptionsLayer/OptionsMenu.is_visible():
+			get_tree().set_input_as_handled()
+			$OptionsLayer/OptionsMenu.show()
 
 func _on_MyMan_start_mission(m_overlay_path : String):
 	mission_rect = $Mission.mission_start(m_overlay_path)
@@ -81,6 +83,7 @@ func _on_MyMan_start_mission(m_overlay_path : String):
 	on_mission = true
 	$Level.set_process(false)
 	$Mission.set_process(true)
+	MyOptionsMenu.in_mission = true
 	
 func end_mission():
 	$Player.set_new_bounds(main_level_rect, pos_holder)
@@ -108,6 +111,7 @@ func end_mission():
 	on_mission = false
 	$Level.set_process(true)
 	$Mission.set_process(false)
+	MyOptionsMenu.in_mission = false
 	
 func fix_camera_bounds():
 	PlayerCamera.limit_top = curr_rect.position.y

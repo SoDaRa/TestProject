@@ -24,8 +24,9 @@ class CustomSorter:
 			"rotate_cw": return 13
 			"rotate_ccw": return 14
 			"zoom_out": return 15
-#			"save_background": return 16
-#			"Dummy_Button": return 17
+			"forward": return 16
+			"turn_direction_cw": return 17
+			"turn_direction_ccw": return 18
 
 			"ui_up": return 0
 			"ui_down": return 1
@@ -200,7 +201,9 @@ func joypad_controls(action:String) -> String:
 	var joypad_controls = "  "
 	for input in action_input_dict[action]:
 		if input is InputEventJoypadButton:
-			joypad_controls = joypad_controls + joy_button_string(input) + ", "
+			joypad_controls += joy_button_string(input) + ", "
+		if input is InputEventJoypadMotion:
+			joypad_controls += joy_axis_string(input) + ", "
 	if joypad_controls.length() > 0:
 		joypad_controls = joypad_controls.substr(0, joypad_controls.length() - 2)
 	return joypad_controls
@@ -209,12 +212,26 @@ func keyboard_mouse_controls(action:String) -> String:
 	var kbm_controls = "  " #kbm = keyboard_mouse
 	for input in action_input_dict[action]:
 		if input is InputEventMouseButton:
-			kbm_controls = kbm_controls + mouse_button_string(input) + ", "
+			kbm_controls += meta_check(input)
+			kbm_controls += mouse_button_string(input) + ", "
 		elif input is InputEventKey:
-			kbm_controls = kbm_controls + OS.get_scancode_string(input.get_scancode()) + ", "
+			kbm_controls += meta_check(input)
+			kbm_controls += OS.get_scancode_string(input.get_scancode()) + ", "
 	if kbm_controls.length() > 0:
 		kbm_controls = kbm_controls.substr(0, kbm_controls.length() - 2)
 	return kbm_controls
+
+func meta_check(input: InputEventWithModifiers) -> String:
+	var additions = ""
+	if input.get_alt():
+		additions += "Alt+"
+	if input.get_shift():
+		additions += "Shift+"
+	if input.get_control():
+		additions += "Ctrl+"
+	if input.get_metakey():
+		additions += "Meta+"
+	return additions
 
 func joy_button_string(button: InputEventJoypadButton) -> String:
 	match button.get_button_index():
@@ -236,7 +253,24 @@ func joy_button_string(button: InputEventJoypadButton) -> String:
 		15: return "DPad Right"
 		_: return "Unknown"
 
+func joy_axis_string(my_axis: InputEventJoypadMotion) -> String:
+	match(my_axis.axis):
+		0:
+			if my_axis.axis_value == 1: return "Left Stick (Right)"
+			elif my_axis.axis_value == -1: return "Left Stick (Left)"
+		1:
+			if my_axis.axis_value == 1: return "Left Stick (Down)"
+			elif my_axis.axis_value == -1: return "Left Stick (Up)"
+		2:
+			if my_axis.axis_value == 1: return "Right Stick (Right)"
+			elif my_axis.axis_value == -1: return "Right Stick (Left)"
+		3:
+			if my_axis.axis_value == 1: return "Right Stick (Down)"
+			elif my_axis.axis_value == -1: return "Right Stick (Up)"
+	return "Error"
+
 func mouse_button_string(button: InputEventMouseButton) -> String:
+	
 	match button.get_button_index():
 		1: return "Left Mouse"
 		2: return "Right Mouse"

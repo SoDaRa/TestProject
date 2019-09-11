@@ -35,15 +35,30 @@ var default_inputmap_dict = {
 	ui_accept = ["enter","space","joy_a"],
 	ui_cancel = ["backspace","joy_b"],
 	ui_select = ["space"],
-#	"" = [""]
+	forward = ["shift+w"],
+	turn_direction_cw = ["shift+e"],
+	turn_direction_ccw = ["shift+q"] #Add comma for more
+#	 = [""]
 }
 onready var MyTree = get_node("VBoxContainer/Tree")
 
 func _ready():
 	MyTree.grab_focus()
+	set_process_input(false)
+
+func _notification(what):
+	match(what):
+		NOTIFICATION_VISIBILITY_CHANGED:
+			if is_visible():
+				set_process_input(true)
+			else:
+				set_process_input(false)
 
 func _on_Tree_item_activated():
 	var selected_item = MyTree.get_selected()
+#	if selected_item.get_text(0).find("Gameplay") != -1 || selected_item.get_text(0).find("UI / Menus") != -1 || \
+#	selected_item.get_text(0).find("Color Picker") != -1:
+#		return
 	if selected_item.get_metadata(0) != null:
 		selected_action = selected_item.get_metadata(0)
 	else:
@@ -51,6 +66,7 @@ func _on_Tree_item_activated():
 	print("KeyBindingControl: Rebinding ", selected_action)
 	assert(InputMap.has_action(selected_action))
 	$InputPrompt.show()
+	$InputPrompt.grab_focus()
 
 func _input(event: InputEvent):
 	if !$InputPrompt.is_visible():
@@ -59,39 +75,50 @@ func _input(event: InputEvent):
 				if !get_rect().has_point(get_global_mouse_position()):
 					accept_event()
 					hide()
-	else:
-		accept_event()
-		if not event.is_pressed():
-			return
-		#Forbidden rebinds
-		if event is InputEventKey && action_category(selected_action) == "UI":
-			if event.get_scancode() == KEY_ENTER:
-				print("Can't rebind enter")
-				close_prompt()
-				return
-			elif event.get_scancode() == KEY_UP:
-				print("Can't rebind up")
-				close_prompt()
-				return
-			elif event.get_scancode() == KEY_DOWN:
-				print("Can't rebind down")
-				close_prompt()
-				return
-		if event is InputEventMouseMotion:
-			return
-	
-		#Remove action
-		if InputMap.action_has_event(selected_action, event):
-			InputMap.action_erase_event(selected_action, event) #TODO: Add check for if no InputEvent is associated with action
+
+func prompt_input(event : InputEvent):
+	if not event.is_pressed():
+		return
+	#Forbidden rebinds
+	if event is InputEventKey && action_category(selected_action) == "UI":
+		if event.get_scancode() == KEY_ENTER:
+			print("Can't rebind enter")
 			close_prompt()
 			return
-		#Rebind action
-		for remove_action in InputMap.get_actions():
-			if InputMap.action_has_event(remove_action, event) && action_category(remove_action) == action_category(selected_action):
+		elif event.get_scancode() == KEY_UP:
+			print("Can't rebind up")
+			close_prompt()
+			return
+		elif event.get_scancode() == KEY_DOWN:
+			print("Can't rebind down")
+			close_prompt()
+			return
+	if event is InputEventMouseMotion:
+		return
+	
+	#Remove action #TODO: Add check for if no InputEvent is associated with action
+	if InputMap.action_has_event(selected_action, event):
+		if event is InputEventWithModifiers: #Double check modifiers since action_has_event doesn't check for those
+			if modifiers_check(selected_action, event):
+				InputMap.action_erase_event(selected_action, event) 
+				close_prompt()
+				return
+		else:
+			InputMap.action_erase_event(selected_action, event) 
+			close_prompt()
+			return
+	#Rebind action
+	for remove_action in InputMap.get_actions():
+		if InputMap.action_has_event(remove_action, event) && action_category(remove_action) == action_category(selected_action):
+			if event is InputEventWithModifiers:
+				if modifiers_check(remove_action, event):
+					InputMap.action_erase_event(remove_action, event)
+					MyTree.update_item(remove_action, action_category(remove_action))
+			else:
 				InputMap.action_erase_event(remove_action, event)
 				MyTree.update_item(remove_action, action_category(remove_action))
-		InputMap.action_add_event(selected_action, event)
-		close_prompt()
+	InputMap.action_add_event(selected_action, event)
+	close_prompt()
 
 func close_prompt():
 	MyTree.update_selected_item()
@@ -109,7 +136,24 @@ func restore_defaults():
 			InputMap.action_add_event(action, input_dict[input])
 	for action in InputMap.get_actions():
 		MyTree.update_item(action, action_category(action))
-	
+
+func modifiers_check(action: String, event: InputEventWithModifiers) -> bool:
+	var action_list = InputMap.get_action_list(action)
+	var similar_event = null
+	for action_input in action_list:
+		if action_input is InputEventWithModifiers:
+			if event is InputEventKey:
+				if action_input.get_scancode() == event.get_scancode():
+					similar_event = action_input
+			if event is InputEventMouse:
+				if action_input.button_mask == event.button_mask:
+					similar_event = action_input
+	if similar_event == null || !(similar_event is InputEventWithModifiers):
+		return false
+	if similar_event.get_shift() == event.get_shift() && similar_event.get_alt() == event.get_alt() && \
+	   similar_event.get_control() == event.get_control() && similar_event.get_metakey() == event.get_metakey():
+		return true
+	return false
 func action_category(action:String):
 	match(action):
 		"up": return "Gameplay"
@@ -128,7 +172,10 @@ func action_category(action:String):
 		"rotate_cw": return "Gameplay"
 		"rotate_ccw": return "Gameplay"
 		"zoom_out": return "Gameplay"
-#		"save_background": return "Gameplay"
+		"forward": return "Gameplay"
+		"turn_direction_cw": return "Gameplay"
+		"turn_direction_ccw": return "Gameplay"
+#		"": return "Gameplay"
 		
 		"ui_up": return "UI"
 		"ui_down": return "UI"
@@ -179,6 +226,9 @@ func get_input_dict() -> Dictionary:
 	input_dict["j"] = InputEventKey.new()
 	input_dict["u"] = InputEventKey.new()
 	input_dict["o"] = InputEventKey.new()
+	input_dict["shift+w"] = InputEventKey.new()
+	input_dict["shift+q"] = InputEventKey.new()
+	input_dict["shift+e"] = InputEventKey.new()
 	
 	input_dict["w"].set_scancode(KEY_W)
 	input_dict["a"].set_scancode(KEY_A)
@@ -204,6 +254,13 @@ func get_input_dict() -> Dictionary:
 	input_dict["j"].set_scancode(KEY_J)
 	input_dict["u"].set_scancode(KEY_U)
 	input_dict["o"].set_scancode(KEY_O)
+	
+	input_dict["shift+w"].set_scancode(KEY_W)
+	input_dict["shift+q"].set_scancode(KEY_Q)
+	input_dict["shift+e"].set_scancode(KEY_E)
+	input_dict["shift+w"].set_shift(true)
+	input_dict["shift+q"].set_shift(true)
+	input_dict["shift+e"].set_shift(true)
 	
 	#Joypad input
 	input_dict["joy_d_left"] = InputEventJoypadButton.new()

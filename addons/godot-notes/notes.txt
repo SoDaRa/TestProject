@@ -3,8 +3,6 @@ HIT SAVE TO SAVE CHANGES!
 To-Do
 - HUD element showing color selection
 - HUD element showing shapes available?
-- Options menu
-- Input mapping in-game
 - Save feature
 - Fix clipping into walls in Fly mode
 - Standardize code (work out where signal functions go and all that)
@@ -41,3 +39,6 @@ TODO Notes:
 
 Circular Container Notes:
 - Copy custom animator but use node.rect_pivot_offset and node.set_rotation(target_pos.angle_to_point(container_center)) and set Start Empty to true
+
+Assets to Consider:
+- Water2D Node

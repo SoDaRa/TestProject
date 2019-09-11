@@ -157,6 +157,15 @@ func _update_color(new_color: Color):
 		$CurrentColorArrow.modulate = Color(new_color.r, new_color.g, new_color.b, 0.5)
 	emit_signal("color_changed", color_array[curr_top_slice], curr_top_slice)
 
+# warning-ignore:unused_argument
+# warning-ignore:unused_argument
+# warning-ignore:unused_argument
+# warning-ignore:unused_argument
+func _on_Tween_tween_step(object, key, elapsed, value):
+	$SelectionArrow.position = polar2cartesian(110, deg2rad(-rect_rotation - 90)) + my_center
+	$SelectionArrow.rotation_degrees = -rect_rotation
+	$CurrentColorArrow.rotation_degrees = -rect_rotation + slice_size * (curr_top_slice - curr_player_slice)
+
 func _on_Tween_tween_all_completed():
 	rect_rotation = wrapf(rect_rotation, 0, 360)
 	if mouse_click:
@@ -178,11 +187,4 @@ func _force_close():
 		picker.hide()
 	hide()
 
-# warning-ignore:unused_argument
-# warning-ignore:unused_argument
-# warning-ignore:unused_argument
-# warning-ignore:unused_argument
-func _on_Tween_tween_step(object, key, elapsed, value):
-	$SelectionArrow.position = polar2cartesian(110, deg2rad(-rect_rotation - 90)) + my_center
-	$SelectionArrow.rotation_degrees = -rect_rotation
-	$CurrentColorArrow.rotation_degrees = -rect_rotation + slice_size * (curr_top_slice - curr_player_slice)
+

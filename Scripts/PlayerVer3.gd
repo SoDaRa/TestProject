@@ -1,7 +1,7 @@
 extends Node
 
 #Colors
-export var color_sequence = [Color(1, 1, 1, 1), Color(0, 1, 1, 1), Color(1, 0, 1, 1), Color(1, 1, 0, 1)] 
+export var color_sequence = [Color(1, 1, 1, 1), Color(0, 1, 1, 1), Color(1, 0, 1, 1), Color(1, 1, 0, 1)]
 var extra_color_queue = [Color.aquamarine, Color.purple, Color.chocolate, Color.orange, Color.gray]
 export var curr_color = 0
 
@@ -20,6 +20,7 @@ var custom_sprite = ImageTexture.new()
 var collision_outline_shader = preload("res://PlayerCollisionOutlineShader.tres")
 
 onready var PaletteMenu = get_node("ColorChoices/PaletteMenu")
+onready var DArrow = get_node("SpriteScale/DirectionArrow")
 
 #Shape
 enum SHAPE {BALL, BOX, TRIANGLE, WALRUS, CUSTOM}
@@ -60,22 +61,22 @@ func _ready():
 		custom_sprite = load("res://Sprites/default_custom.png")
 	MySprite.modulate = color_sequence[curr_color]
 	update_shape()
-	
+
 	for my_color in color_sequence:
-#		CCPButtonContainer._add_color(my_color, self)
 		PaletteMenu.add_color(my_color)
 	PaletteMenu.connect("color_changed", self, "_color_picker_changed")
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 # warning-ignore:unused_argument
 func _process(delta):
+	#Check Player In-Bounds
 	var my_position = $PlayerBody.position
 	var level_start = level_rect.position
 	var level_end = level_rect.end
 	var is_in_bounds = level_rect.has_point(my_position)
-	var is_out_of_bounds = my_position.x < level_start.x - tolerance || my_position.y < level_start.y - tolerance 
+	var is_out_of_bounds = my_position.x < level_start.x - tolerance || my_position.y < level_start.y - tolerance
 	is_out_of_bounds = is_out_of_bounds || my_position.x > level_end.x + tolerance || my_position.y > level_end.y + tolerance
-	
+
 	if is_in_bounds:
 		last_valid_position = $PlayerBody.position
 	if is_out_of_bounds:
@@ -84,33 +85,8 @@ func _process(delta):
 		else: #If somehow the last_valid_position isn't within the level_rect, then default to it's top left corner.
 			$PlayerBody.position = level_rect.position
 	
-	if Input.is_action_just_pressed("Dummy_Button"):
-		if !extra_color_queue.empty():
-			var new_color = extra_color_queue.pop_front()
-			color_sequence.append(new_color)
-			PaletteMenu.add_color(new_color)
-		
-#	if curr_shape != SHAPE.BALL: #Get rotation if not a ball
-#		MaskSprite.rotation_degrees = MySprite.rotation_degrees
-		
-		#Shape Swap
-	if Input.is_action_just_pressed("swap_shape"):
-		curr_shape += 1
-		curr_shape = wrapi(curr_shape, 0, shapes_available)
-		update_shape()
-		
-	#Color Swap
-	if Input.is_action_just_pressed("next_color"):
-		curr_color += 1
-		curr_color = wrapi(curr_color, 0, color_sequence.size())
-		MySprite.modulate = color_sequence[curr_color]
-
-	if Input.is_action_just_pressed("previous_color"):
-		curr_color -= 1
-		curr_color = wrapi(curr_color, 0, color_sequence.size())
-		MySprite.modulate = color_sequence[curr_color]
-		
-	#Size Swapping
+	#Following inputs are here instead of _input so they get updated more regularly
+	#Size Swapping 
 	if Input.is_action_pressed("decrease_size") && curr_size != MIN_SIZE:
 		var decreased_by = 1.0/BASE_SIZE      #HACK Probably should do this as a function and have more clear MAX and MIN
 		var new_scale = MySprite.scale
@@ -121,7 +97,7 @@ func _process(delta):
 			MaskSprite.scale = new_scale
 			RigidCollision.shape = update_collision()
 			curr_size -= 1
-		
+
 		else: #If already too small, just say we're at the min
 			curr_size = MIN_SIZE
 
@@ -129,12 +105,69 @@ func _process(delta):
 		var increased_by = 1.0/BASE_SIZE
 		var new_scale = MySprite.scale
 		new_scale += Vector2(increased_by, increased_by)
-#		RigidCollision.scale = new_scale
 		MySprite.scale = new_scale
 		MaskSprite.scale = new_scale
 		RigidCollision.shape = update_collision()
 		curr_size += 1
 		
+	#Directional Arrow Adjustments
+	if Input.is_key_pressed(KEY_SHIFT) && $PlayerBody.curr_mode == $PlayerBody.KIN_MODE:
+		DArrow.show()
+		
+		if Input.is_action_pressed("turn_direction_ccw"):
+			if DArrow.get_node("Tween").is_active():
+				DArrow.get_node("Tween").remove_all()
+				DArrow.rotation_degrees = wrapf(DArrow.rotation_degrees,0, 360)
+			DArrow.rotation_degrees -= delta * 120
+			$PlayerBody.direction = Vector2.RIGHT.rotated(deg2rad(DArrow.rotation_degrees - 90))
+		if Input.is_action_pressed("turn_direction_cw"):
+			if DArrow.get_node("Tween").is_active():
+				DArrow.get_node("Tween").remove_all()
+				DArrow.rotation_degrees = wrapf(DArrow.rotation_degrees,0, 360)
+			DArrow.rotation_degrees += delta * 120
+			$PlayerBody.direction = Vector2.RIGHT.rotated(deg2rad(DArrow.rotation_degrees - 90))
+	else:
+		DArrow.hide()
+
+func _input(event:InputEvent):
+	if event.is_action("Dummy_Button") && Input.is_action_just_pressed("Dummy_Button"):
+		if !extra_color_queue.empty():
+			var new_color = extra_color_queue.pop_front()
+			color_sequence.append(new_color)
+			PaletteMenu.add_color(new_color)
+	#"is_event_just_pressed" Events
+	if !event.is_echo() && event.is_pressed():
+	#Shape Swap
+		if event.is_action("swap_shape"):
+			curr_shape += 1
+			curr_shape = wrapi(curr_shape, 0, shapes_available)
+			update_shape()
+
+		#Color Swap
+		if event.is_action("next_color"):
+			curr_color += 1
+			curr_color = wrapi(curr_color, 0, color_sequence.size())
+			MySprite.modulate = color_sequence[curr_color]
+
+		if Input.is_action_just_pressed("previous_color"):
+			curr_color -= 1
+			curr_color = wrapi(curr_color, 0, color_sequence.size())
+			MySprite.modulate = color_sequence[curr_color]
+	
+	if event is InputEventMouseMotion && Input.is_action_pressed("paint"):
+		#Clear Tween if in motion
+		if DArrow.get_node("Tween").is_active():
+			DArrow.get_node("Tween").remove_all()
+			DArrow.rotation_degrees = wrapf(DArrow.rotation_degrees,0, 360)
+		#Get direction
+		var direction = event.speed.normalized()
+		var new_angle = wrapf(rad2deg(direction.angle()) + 90, 0, 360) #Convert so arrow points correctly
+		var diff = wrapf(DArrow.rotation_degrees - new_angle, -180, 180) #Find the difference from current angle
+		new_angle = DArrow.rotation_degrees - diff #Apply that difference so the tween takes the shortest path there
+		DArrow.get_node("Tween").interpolate_property(DArrow, "rotation_degrees", null, new_angle, 0.1, Tween.TRANS_LINEAR, Tween.EASE_IN)
+		DArrow.get_node("Tween").start()
+		$PlayerBody.direction = direction #Let Rigidbody know of the direction
+
 func _unhandled_input(event):
 	if event.is_action("palette_menu") && !PaletteMenu.is_visible() && !get_tree().paused:
 		if Input.is_action_just_pressed("palette_menu"):
@@ -146,7 +179,7 @@ func _unhandled_input(event):
 func _physics_process(delta):
 	$SpriteScale.position = $PlayerBody.position
 	MySprite.rotation_degrees = $PlayerBody.rotation_degrees
-	
+
 	if Input.is_action_pressed("paint") && get_tree().paused == false:
 		if curr_shape != SHAPE.BALL: #Get rotation if not a ball
 			MaskSprite.rotation_degrees = MySprite.rotation_degrees
@@ -158,7 +191,7 @@ func _physics_process(delta):
 		var player_paint = Image.new() 								#Image to send out
 		player_paint.create(my_mask.get_width(), my_mask.get_height(), false, Image.FORMAT_RGBA8)
 		player_paint.blit_rect_mask(player_color, my_mask, my_mask.get_used_rect(), Vector2(0,0))
-		
+
 		var mask_pos = $PlayerBody.position - Vector2(player_paint.get_width() / 2.0,player_paint.get_height() / 2.0)
 		emit_signal("painted", player_paint, mask_pos)
 		$PlayerTrail.draw_trail(my_mask, mask_pos, color_sequence[curr_color])
@@ -201,21 +234,21 @@ func _on_RigidBody2D_jumping():
 		$PlayerMask/Viewport/PMSpriteScale/MaskAnimation.stop()
 	$SpriteScale/AnimationPlayer.play("JumpAnimation")
 	$PlayerMask/Viewport/PMSpriteScale/MaskAnimation.play("JumpAnimation")
-	
+
 func set_new_bounds(new_rect: Rect2, new_pos: Vector2):
 	level_rect = new_rect
 	$PlayerBody.position = new_pos
 	$SpriteScale.position = $PlayerBody.position
 	MySprite.rotation_degrees = $PlayerBody.rotation_degrees
 	last_valid_position = new_pos
-	
+
 func update_collision() -> Shape2D:
 	var new_collision
 	match(curr_shape):
-		SHAPE.BALL: 
+		SHAPE.BALL:
 			new_collision = CircleShape2D.new()
 			new_collision.set_radius(float(curr_size) / 2.0)
-		
+
 		SHAPE.TRIANGLE:
 			new_collision = ConvexPolygonShape2D.new()
 			var new_vector_pool = PoolVector2Array()
@@ -225,10 +258,10 @@ func update_collision() -> Shape2D:
 				var new_vector = new_vector_pool[idx] * scale
 				new_vector_pool.set(idx, new_vector)
 			new_collision.set_points(new_vector_pool)
-		
+
 		_:		#This is the case for the box, walrus and custom modes.
 			new_collision = RectangleShape2D.new()
 			var new_extends = Vector2(float(curr_size) / 2.0, float(curr_size) / 2.0)
 			new_collision.set_extents(new_extends)
-			
+
 	return new_collision

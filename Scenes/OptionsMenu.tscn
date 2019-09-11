@@ -1,14 +1,15 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://Scenes/OptionsMenu.gd" type="Script" id=1]
-[ext_resource path="res://Scenes/KeyBindingControl.tscn" type="PackedScene" id=2]
-[ext_resource path="res://Comfortaa-Bold.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://CustomPickerButtonTheme.tres" type="Theme" id=2]
+[ext_resource path="res://Scenes/KeyBindingControl.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Comfortaa-Bold.ttf" type="DynamicFontData" id=4]
 
 [sub_resource type="DynamicFont" id=1]
 size = 40
 outline_size = 3
 outline_color = Color( 0, 0, 0, 1 )
-font_data = ExtResource( 3 )
+font_data = ExtResource( 4 )
 
 [node name="Control" type="Control"]
 pause_mode = 2
@@ -27,29 +28,55 @@ margin_right = 100.0
 margin_bottom = 234.5
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+margin_top = 61.0
 margin_right = 200.0
-margin_bottom = 469.0
+margin_bottom = 530.0
+theme = ExtResource( 2 )
 custom_constants/separation = 23
 
 [node name="Resume" type="Button" parent="CenterContainer/VBoxContainer"]
+modulate = Color( 0.388235, 1, 0.0431373, 1 )
 margin_right = 200.0
 margin_bottom = 100.0
 rect_min_size = Vector2( 200, 100 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_color_hover = Color( 0, 0, 0, 1 )
+custom_colors/font_color_pressed = Color( 0, 0, 0, 1 )
 text = "Resume"
 
 [node name="KeyBindings" type="Button" parent="CenterContainer/VBoxContainer"]
+modulate = Color( 0.360784, 0.984314, 1, 1 )
 margin_top = 123.0
 margin_right = 200.0
 margin_bottom = 223.0
 rect_min_size = Vector2( 200, 100 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_color_hover = Color( 0, 0, 0, 1 )
+custom_colors/font_color_pressed = Color( 0, 0, 0, 1 )
 text = "Edit Key Bindings"
 
 [node name="SaveBG" type="Button" parent="CenterContainer/VBoxContainer"]
+modulate = Color( 0.701961, 0.403922, 1, 1 )
 margin_top = 246.0
 margin_right = 200.0
 margin_bottom = 346.0
 rect_min_size = Vector2( 200, 100 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_color_hover = Color( 0, 0, 0, 1 )
+custom_colors/font_color_pressed = Color( 0, 0, 0, 1 )
 text = "Save Background"
+
+[node name="EndMission" type="Button" parent="CenterContainer/VBoxContainer"]
+visible = false
+modulate = Color( 1, 0.933333, 0.345098, 1 )
+margin_top = 369.0
+margin_right = 200.0
+margin_bottom = 469.0
+rect_min_size = Vector2( 200, 100 )
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_color_hover = Color( 0, 0, 0, 1 )
+custom_colors/font_color_pressed = Color( 0, 0, 0, 1 )
+text = "End Mission"
 
 [node name="Exit" type="Button" parent="CenterContainer/VBoxContainer"]
 margin_top = 369.0
@@ -59,7 +86,7 @@ rect_min_size = Vector2( 200, 100 )
 disabled = true
 text = "Exit Game"
 
-[node name="InputEditor" parent="." instance=ExtResource( 2 )]
+[node name="InputEditor" parent="." instance=ExtResource( 3 )]
 visible = false
 
 [node name="WaitLabel" type="Label" parent="."]
@@ -85,5 +112,6 @@ one_shot = true
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Resume" to="." method="_on_Resume_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/KeyBindings" to="." method="_on_KeyBindings_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/SaveBG" to="." method="_on_SaveBG_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/EndMission" to="." method="_on_EndMission_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Exit" to="." method="_on_Exit_pressed"]
 [connection signal="timeout" from="DelayTimer" to="." method="_on_DelayTimer_timeout"]

@@ -11,6 +11,8 @@ export var MAX_ANGULAR_SPEED = 10
 #Kinematic Movement
 export var kin_speed = 200
 
+var direction = Vector2(0,-1)
+
 var apply_jump = false #This is used to delay a jump
 
 signal jumping
@@ -63,19 +65,22 @@ func _integrate_forces(state: Physics2DDirectBodyState):
 			if abs(yAxis) > .14:
 				velocity.y = yAxis * 1.25 * kin_speed
 		else:
-			if Input.is_action_pressed("left"):
-				velocity.x -= kin_speed
-			if Input.is_action_pressed("right"):
-				velocity.x += kin_speed
-			if Input.is_action_pressed("up"):
-				velocity.y -= kin_speed
-			if Input.is_action_pressed("down"):
-				velocity.y += kin_speed
-
-		if Input.is_action_pressed("rotate_cw") && rotation_speed < MAX_ANGULAR_SPEED:
-			rotation_speed += rotate_speed_growth
-		if Input.is_action_pressed("rotate_ccw") && rotation_speed > -MAX_ANGULAR_SPEED:
-			rotation_speed -= rotate_speed_growth
+			if Input.is_action_pressed("forward"):
+				velocity = direction * kin_speed
+			else:
+				if Input.is_action_pressed("left"):
+					velocity.x -= kin_speed
+				if Input.is_action_pressed("right"):
+					velocity.x += kin_speed
+				if Input.is_action_pressed("up"):
+					velocity.y -= kin_speed
+				if Input.is_action_pressed("down"):
+					velocity.y += kin_speed
+		if !Input.is_key_pressed(KEY_SHIFT):
+			if Input.is_action_pressed("rotate_cw") && rotation_speed < MAX_ANGULAR_SPEED:
+				rotation_speed += rotate_speed_growth
+			if Input.is_action_pressed("rotate_ccw") && rotation_speed > -MAX_ANGULAR_SPEED:
+				rotation_speed -= rotate_speed_growth
 		#Slow/Stop spinning
 		if Input.is_action_pressed("rotate_ccw") && Input.is_action_pressed("rotate_cw"): #TODO: For controller, make this R3 and Mouse 3?
 			rotation_speed = rotation_speed / 1.05
